@@ -1,0 +1,48 @@
+extends layout
+
+block content
+    .d-flex.justify-content-between.align-items-center.mb-4
+        h1.mb-0 Слоты
+        button.btn.btn-success#addSlotBtn(type="button" data-bs-toggle="modal" data-bs-target="#slotModal")
+            i.bi.bi-plus-lg.me-1
+            | Добавить слот
+
+    table.table.table-hover
+        thead
+            tr
+                th ID
+                th Номер
+                th Зона (ID)
+                th Статус
+                th Действия
+        tbody#slotsTableBody
+
+    //– Модальное окно для добавления / редактирования слота
+    .modal.fade#slotModal(tabindex="-1" aria-hidden="true")
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    h5.modal-title#slotModalLabel Добавить слот
+                    button.btn-close(type="button" data-bs-dismiss="modal")
+                .modal-body
+                    form#slotForm
+                        input(type="hidden" id="slotId")
+                        .mb-3
+                            label.form-label(for="slot_number") Номер слота
+                            input.form-control#slot_number(type="number" required)
+                        .mb-3
+                            label.form-label(for="zone_id") Зона
+                            select.form-select#zone_id(required)
+                                option(value="" disabled selected) Выберите зону
+                        .mb-3
+                            label.form-label(for="status") Статус
+                            select.form-select#status
+                                option(value="free") free
+                                option(value="occupied") occupied
+                                option(value="reserved") reserved
+                .modal-footer
+                    button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Отмена
+                    button.btn.btn-primary(type="submit" form="slotForm") Сохранить
+
+block scripts
+    script(src="/static/js/slots.js")

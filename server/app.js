@@ -1,7 +1,10 @@
+// server/app.js
 const express = require('express');
 const path    = require('path');
-const initDB  = require('./models/Init');
-const config  = require('./config/app');
+
+const initDB = require('./models/Init');
+const config = require('./config/app');
+
 const { authMiddleware } = require('./middlewares/AuthMiddleware');
 
 const authRoutes    = require('./routes/Auth');
@@ -19,23 +22,43 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, '../client/views'));
 app.use('/static', express.static(path.join(__dirname, '../client/public')));
-
-// JSON-парсер
 app.use(express.json());
 
-// Редирект корня на /login
-app.get('/', (req, res) => res.redirect('/login'));
+// ——— Публичные страницы —–
+// без какой-либо server-side проверки
+app.get('/',         (req, res) => res.redirect('/login'));
+app.get('/login',    (req, res) => res.render('login',    { pageTitle: 'Вход',        showNav: false }));
+app.get('/register', (req, res) => res.render('register', { pageTitle: 'Регистрация', showNav: false }));
 
-// Клиентские страницы
-app.get('/login',      (req, res) => res.render('login'));
-app.get('/dashboard',  authMiddleware, (req, res) => res.render('dashboard'));
-app.get('/cars',       authMiddleware, (req, res) => res.render('cars'));
-// …slots, bookings, users
+// ——— Все клиентские страницы (Pug) —–
+// рендерятся без authMiddleware, клиент сам проверяет токен
+app.get('/dashboard', (req, res) =>
+    res.render('dashboard', { pageTitle: 'Дашборд',      showNav: true })
+);
+app.get('/cars',      (req, res) =>
+    res.render('cars',      { pageTitle: 'Автомобили',   showNav: true })
+);
+app.get('/slots',     (req, res) =>
+    res.render('slots',     { pageTitle: 'Слоты',        showNav: true })
+);
+app.get('/tariffs',   (req, res) =>
+    res.render('tariffs',   { pageTitle: 'Тарифы',       showNav: true })
+);
+app.get('/zones',     (req, res) =>
+    res.render('zones',     { pageTitle: 'Зоны',         showNav: true })
+);
+app.get('/bookings',  (req, res) =>
+    res.render('bookings',  { pageTitle: 'Бронирования', showNav: true })
+);
+app.get('/users',     (req, res) =>
+    res.render('users',     { pageTitle: 'Пользователи', showNav: true })
+);
 
-// API: сначала public /api/auth
+// ——— API-маршруты —–
+// доступ к /api/auth без токена
 app.use('/api/auth', authRoutes);
 
-// Теперь защищённый API: всё, что идёт по /api/* — через JWT
+// всё остальное под /api/* требует JWT
 app.use('/api', authMiddleware);
 
 app.use('/api/users',    userRoutes);
@@ -46,17 +69,17 @@ app.use('/api/cars',     carRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/logs',     logRoutes);
 
-// Health
+// Health-check
 app.get('/health', (req, res) => res.json({ status: 'OK' }));
 
-// Старт
+// Запуск сервера
 if (require.main === module) {
     initDB()
         .then(() => app.listen(config.port, () => {
             console.log(`🚀 Сервер на http://localhost:${config.port}`);
         }))
         .catch(err => {
-            console.error(err);
+            console.error('Ошибка инициализации БД:', err);
             process.exit(1);
         });
 }

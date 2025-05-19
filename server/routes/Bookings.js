@@ -18,14 +18,14 @@ router.post('/',   controller.createBooking);
 router.get('/my',  controller.getMyBookings);
 
 // Оператор и админ — просмотр «pending», одобрение/отклонение
-router.get('/pending',      roleCheck(['operator','admin']), controller.getPending);
-router.post('/approve/:id', roleCheck(['operator','admin']), controller.approveBooking);
-router.post('/reject/:id',  roleCheck(['operator','admin']), controller.rejectBooking);
+router.get('/pending',      roleCheck(['employee','admin']), controller.getPending);
+router.post('/approve/:id', roleCheck(['employee','admin']), controller.approveBooking);
+router.post('/reject/:id',  roleCheck(['employee','admin']), controller.rejectBooking);
 
 // Любой залогиненный может отменить свою бронь
 router.post('/cancel/:id',  controller.cancelBooking);
 
 // Админ — полный список всех бронирований
-router.get('/',             roleCheck(['admin']), controller.getAll);
+router.get('/',             roleCheck(['employee','admin']), controller.getAll);
 
 module.exports = router;

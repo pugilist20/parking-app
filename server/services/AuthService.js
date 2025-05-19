@@ -1,14 +1,14 @@
 // server/services/AuthService.js
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const jwt    = require('jsonwebtoken');
 const { User } = require('../models/Models');
 require('dotenv').config();
 
 class AuthService {
     constructor() {
-        this.userModel = User;
-        this.jwtSecret = process.env.JWT_SECRET;
-        this.jwtExpiresIn = process.env.JWT_EXPIRES_IN;
+        this.userModel   = User;
+        this.jwtSecret   = process.env.JWT_SECRET;
+        this.jwtExpiresIn= process.env.JWT_EXPIRES_IN;
     }
 
     async register({ username, password, fullname, email }) {
@@ -23,8 +23,18 @@ class AuthService {
             throw err;
         }
         const hash = await bcrypt.hash(password, 10);
-        const user = await this.userModel.create({ username, password: hash, fullname, email, role: 'guest' });
-        const token = jwt.sign({ id: user.id, role: user.role }, this.jwtSecret, { expiresIn: this.jwtExpiresIn });
+        const user = await this.userModel.create({
+            username,
+            password: hash,
+            fullname,
+            email,
+            role: 'user'
+        });
+        const token = jwt.sign(
+            { id: user.id, role: user.role },
+            this.jwtSecret,
+            { expiresIn: this.jwtExpiresIn }
+        );
         return { token };
     }
 
@@ -40,7 +50,11 @@ class AuthService {
             err.status = 401;
             throw err;
         }
-        const token = jwt.sign({ id: user.id, role: user.role }, this.jwtSecret, { expiresIn: this.jwtExpiresIn });
+        const token = jwt.sign(
+            { id: user.id, role: user.role },
+            this.jwtSecret,
+            { expiresIn: this.jwtExpiresIn }
+        );
         return { token };
     }
 }

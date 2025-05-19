@@ -1,0 +1,56 @@
+extends layout
+
+block content
+    .d-flex.justify-content-between.align-items-center.mb-4
+        h1.mb-0 Пользователи
+        button.btn.btn-success#addUserBtn(type="button" data-bs-toggle="modal" data-bs-target="#userModal")
+            i.bi.bi-plus-lg.me-1
+            | Добавить пользователя
+
+    table.table.table-hover
+        thead
+            tr
+                th ID
+                th Логин
+                th Имя
+                th E-mail
+                th Роль
+                th Дата создания
+                th Действия
+        tbody#usersTableBody
+
+    //– Модалка «Добавить/Редактировать пользователя»
+    .modal.fade#userModal(tabindex="-1" aria-hidden="true")
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    h5.modal-title#userModalLabel Добавить пользователя
+                    button.btn-close(type="button" data-bs-dismiss="modal")
+                .modal-body
+                    form#userForm
+                        input(type="hidden" id="userId")
+                        .mb-3
+                            label.form-label(for="username") Логин
+                            input.form-control#username(type="text" required)
+                        .mb-3
+                            label.form-label(for="password") Пароль
+                            input.form-control#password(type="password")
+                            small.text-muted пароля не будет обновлено, если оставить пустым
+                        .mb-3
+                            label.form-label(for="fullname") Имя
+                            input.form-control#fullname(type="text" required)
+                        .mb-3
+                            label.form-label(for="email") E-mail
+                            input.form-control#email(type="email" required)
+                        .mb-3
+                            label.form-label(for="role") Роль
+                            select.form-select#role(required)
+                                option(value="admin") admin
+                                option(value="employee") employee
+                                option(value="user", selected) user
+                .modal-footer
+                    button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Отмена
+                    button.btn.btn-primary(type="submit" form="userForm") Сохранить
+
+block scripts
+    script(src="/static/js/users.js")

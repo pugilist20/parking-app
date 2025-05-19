@@ -1,0 +1,41 @@
+extends layout
+
+block content
+    .d-flex.justify-content-between.align-items-center.mb-4
+        h1.mb-0 Зоны
+        button.btn.btn-success#addZoneBtn(type="button" data-bs-toggle="modal" data-bs-target="#zoneModal")
+            i.bi.bi-plus-lg.me-1
+            | Добавить зону
+
+    table.table.table-hover
+        thead
+            tr
+                th ID
+                th Название
+                th Тариф (ID)
+                th Действия
+        tbody#zonesTableBody
+
+    //- Модалка добавления/редактирования зоны
+    .modal.fade#zoneModal(tabindex="-1" aria-hidden="true")
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    h5.modal-title#zoneModalLabel Добавить зону
+                    button.btn-close(type="button" data-bs-dismiss="modal")
+                .modal-body
+                    form#zoneForm
+                        input(type="hidden" id="zoneId")
+                        .mb-3
+                            label.form-label(for="name") Название
+                            input.form-control#name(type="text" required)
+                        .mb-3
+                            label.form-label(for="tariff_id") Тариф
+                            select.form-select#tariff_id(required)
+                                option(value="" disabled selected) Загрузка тарифов...
+                .modal-footer
+                    button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Отмена
+                    button.btn.btn-primary(type="submit" form="zoneForm") Сохранить
+
+block scripts
+    script(src="/static/js/zones.js")

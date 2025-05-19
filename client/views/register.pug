@@ -1,0 +1,30 @@
+extends layout
+
+block content
+    .vh-100.d-flex.align-items-center.justify-content-center.bg-white
+        .card.shadow-lg(style="max-width: 400px; width: 100%;")
+            .card-body.p-4
+                h2.text-center.mb-4
+                    i.bi.bi-person-plus.me-2
+                    | Регистрация
+                form#registerForm
+                    .mb-3
+                        label.form-label(for="username") Логин
+                        input.form-control#username(type="text" name="username" placeholder="Введите логин" required)
+                    .mb-3
+                        label.form-label(for="password") Пароль
+                        input.form-control#password(type="password" name="password" placeholder="Введите пароль" required)
+                    .mb-3
+                        label.form-label(for="fullname") Имя
+                        input.form-control#fullname(type="text" name="fullname" placeholder="Введите имя" required)
+                    .mb-3
+                        label.form-label(for="email") E-mail
+                        input.form-control#email(type="email" name="email" placeholder="Введите e-mail" required)
+                    .d-grid
+                        button.btn.btn-primary(type="submit") Зарегистрироваться
+                p.text-center.text-danger.mt-3#registerError(style="display:none;")
+                .text-center.mt-2
+                    a(href="/login") Уже есть аккаунт? Войти
+
+block scripts
+    script(src="/static/js/auth.js")

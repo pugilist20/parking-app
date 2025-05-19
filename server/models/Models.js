@@ -7,7 +7,7 @@ const User = sequelize.define('user', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     username: { type: DataTypes.STRING, unique: true, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
-    role: { type: DataTypes.ENUM('admin','employee','user','guest'), defaultValue: 'user' },
+    role: { type: DataTypes.ENUM('admin','employee','user'), defaultValue: 'user' },
     fullname: { type: DataTypes.STRING },
     email: { type: DataTypes.STRING, unique: true },
     createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
@@ -58,18 +58,24 @@ const Booking = sequelize.define('booking', {
 
 // Журнал действий
 const Log = sequelize.define('log', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    user_id: { type: DataTypes.INTEGER, allowNull: false },
-    action: { type: DataTypes.STRING, allowNull: false },
-    created_at: {
-        type: DataTypes.DATE,
+    id:      { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    user_id: { type: DataTypes.INTEGER },
+    action:  { type: DataTypes.STRING,  allowNull: false },
+
+    // Здесь мы говорим: "createdAt" — это ваше поле "created_at"
+    createdAt: {
+        type:         DataTypes.DATE,
         defaultValue: DataTypes.NOW,
-        get() {
-            const raw = this.getDataValue('created_at');
-            if (!raw) return null;
-            return raw.toISOString().replace('T', ' ').split('.')[0];
-        }
+        field:        'created_at'
+    },
+    // И, если нужно, можно так же переназвать updatedAt
+    updatedAt: {
+        type:  DataTypes.DATE,
+        field: 'updated_at'
     }
+}, {
+    tableName:  'logs',
+    timestamps: true,      // оставляем timestamps, но с кастомными именами
 });
 
 // Ассоциации с ограничениями целостности (RESTRICT)
@@ -129,11 +135,11 @@ Car.belongsTo(ParkingSlot, {
 
 User.hasMany(Log, {
     foreignKey: { name: 'user_id', allowNull: false },
-    onDelete: 'RESTRICT', onUpdate: 'CASCADE'
+    onDelete: 'CASCADE', hooks:true, onUpdate: 'CASCADE'
 });
 Log.belongsTo(User, {
     foreignKey: { name: 'user_id', allowNull: false },
-    onDelete: 'RESTRICT', onUpdate: 'CASCADE'
+    onDelete: 'CASCADE', onUpdate: 'CASCADE'
 });
 
 module.exports = { User, Tariff, Zone, ParkingSlot, Car, Booking, Log };

@@ -1,11 +1,7 @@
 extends layout
 
-//- Переопределяем заголовок страницы
-block title
-    | Вход в систему
-
 block content
-    .vh-100.d-flex.align-items-center.justify-content-center.bg-light
+    .vh-100.d-flex.align-items-center.justify-content-center.bg-white
         .card.shadow-lg(style="max-width: 400px; width: 100%;")
             .card-body.p-4
                 h2.text-center.mb-4
@@ -14,24 +10,15 @@ block content
                 form#loginForm
                     .mb-3
                         label.form-label(for="username") Логин
-                        input.form-control#username(
-                            type="text"
-                            name="username"
-                            placeholder="Введите логин"
-                            required
-                        )
+                        input.form-control#username(type="text" name="username" placeholder="Введите логин" required)
                     .mb-3
                         label.form-label(for="password") Пароль
-                        input.form-control#password(
-                            type="password"
-                            name="password"
-                            placeholder="Введите пароль"
-                            required
-                        )
+                        input.form-control#password(type="password" name="password" placeholder="Введите пароль" required)
                     .d-grid
                         button.btn.btn-primary(type="submit") Войти
                 p.text-center.text-danger.mt-3#loginError(style="display:none;")
+                .text-center.mt-2
+                    a(href="/register") Нет аккаунта? Зарегистрироваться
 
 block scripts
-    //– Скрипт только для страницы логина
     script(src="/static/js/auth.js")

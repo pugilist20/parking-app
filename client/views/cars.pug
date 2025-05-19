@@ -1,0 +1,49 @@
+//- client/views/cars.pug
+extends layout
+
+block content
+    .d-flex.justify-content-between.align-items-center.mb-4
+        h1.mb-0 Автомобили
+        button.btn.btn-success#addCarBtn(type="button" data-bs-toggle="modal" data-bs-target="#carModal")
+            i.bi.bi-plus-lg.me-1
+            | Добавить автомобиль
+
+    //- Таблица машин
+    table.table.table-striped
+        thead
+            tr
+                th ID
+                th Гос. номер
+                th Модель
+                th “Въезд”
+                th “Выезд”
+                th “Слот”
+                th Действия
+        tbody#carsTableBody
+            //- будет заполнено JS
+
+    //- Модальное окно для создания/редактирования
+    .modal.fade#carModal(tabindex="-1" aria-hidden="true")
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    h5.modal-title#carModalLabel Добавить автомобиль
+                    button.btn-close(type="button" data-bs-dismiss="modal")
+                .modal-body
+                    form#carForm
+                        input(type="hidden" id="carId")
+                        .mb-3
+                            label.form-label(for="license_plate") Гос. номер
+                            input.form-control#license_plate(type="text" required)
+                        .mb-3
+                            label.form-label(for="model") Модель
+                            input.form-control#model(type="text" required)
+                        .mb-3
+                            label.form-label(for="parking_slot_id") Слот (ID)
+                            input.form-control#parking_slot_id(type="number" required)
+                .modal-footer
+                    button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Отмена
+                    button.btn.btn-primary(type="submit" form="carForm") Сохранить
+
+block scripts
+    script(src="/static/js/cars.js")

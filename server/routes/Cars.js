@@ -7,7 +7,7 @@ const { CarService } = require('../services/CarService');
 const carService = new CarService();
 const carController = new CarController(carService);
 
-router.use(roleCheck(['admin','employee','user','guest']));
+router.use(roleCheck(['admin','employee','user']));
 router.get('/',           carController.getAll);
 router.get('/active',     carController.getActive);
 router.get('/filter',     carController.filter);

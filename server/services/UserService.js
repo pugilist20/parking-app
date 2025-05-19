@@ -46,7 +46,7 @@ class UserService {
             password: hash,
             fullname,
             email,
-            role  // роль может быть 'admin','employee','user','guest'
+            role  // роль может быть 'admin','employee','user'
         });
 
         await Log.create({

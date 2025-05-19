@@ -1,0 +1,40 @@
+extends layout
+
+block content
+    .d-flex.justify-content-between.align-items-center.mb-4
+        h1.mb-0 Тарифы
+        button.btn.btn-success#addTariffBtn(type="button" data-bs-toggle="modal" data-bs-target="#tariffModal")
+            i.bi.bi-plus-lg.me-1
+            | Добавить тариф
+
+    table.table.table-striped
+        thead
+            tr
+                th ID
+                th Название
+                th Цена/час
+                th Действия
+        tbody#tariffsTableBody
+
+    //- Модалка добавления/редактирования тарифа
+    .modal.fade#tariffModal(tabindex="-1" aria-hidden="true")
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    h5.modal-title#tariffModalLabel Добавить тариф
+                    button.btn-close(type="button" data-bs-dismiss="modal")
+                .modal-body
+                    form#tariffForm
+                        input(type="hidden" id="tariffId")
+                        .mb-3
+                            label.form-label(for="name") Название
+                            input.form-control#name(type="text" required)
+                        .mb-3
+                            label.form-label(for="price_per_hour") Цена за час
+                            input.form-control#price_per_hour(type="number" step="0.01" required)
+                .modal-footer
+                    button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Отмена
+                    button.btn.btn-primary(type="submit" form="tariffForm") Сохранить
+
+block scripts
+    script(src="/static/js/tariffs.js")

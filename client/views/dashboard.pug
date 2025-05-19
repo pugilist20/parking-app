@@ -1,15 +1,12 @@
-//- client/views/dashboard.pug
 extends layout
-
-block title
-    | Дашборд
 
 block content
     //- Герой-секция: поиск по зоне
-    .hero.bg-light.py-5
+    .hero.py-5
+        .overlay
         .container.text-center
-            h1.mb-4 Park. Pay. Go.
-            p.lead.mb-4 Бесплатное бронирование парковки заранее или оплата по факту
+            h1.mb-4.text-black Park. Pay. Go.
+            p.lead.mb-4.text-black Бесплатное бронирование парковки заранее или оплата по факту
             form#searchForm.d-flex.justify-content-center
                 input.form-control.w-50.me-2(
                     type="text",
@@ -49,7 +46,7 @@ block content
                 .col-md-3
                     i.bi.bi-4-circle.display-4.mb-2
                     h5 Наслаждайтесь
-                    p Паркуйтесь и оплачивайте через приложение.
+                    p Паркуйтесь и оплачивайте при выезде.
 
 block scripts
     //- Скрипт для обработки формы поиска
