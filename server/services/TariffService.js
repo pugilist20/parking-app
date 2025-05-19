@@ -1,4 +1,4 @@
-const { Tariff, Log } = require('../models/models');
+const { Tariff, Log } = require('../models/Models');
 class TariffService {
     async getAll() { return Tariff.findAll(); }
     async getById(id) { return Tariff.findByPk(id); }

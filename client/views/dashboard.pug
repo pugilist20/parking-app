@@ -1,0 +1,56 @@
+//- client/views/dashboard.pug
+extends layout
+
+block title
+    | Дашборд
+
+block content
+    //- Герой-секция: поиск по зоне
+    .hero.bg-light.py-5
+        .container.text-center
+            h1.mb-4 Park. Pay. Go.
+            p.lead.mb-4 Бесплатное бронирование парковки заранее или оплата по факту
+            form#searchForm.d-flex.justify-content-center
+                input.form-control.w-50.me-2(
+                    type="text",
+                    name="zone",
+                    placeholder="Введите номер зоны",
+                    required
+                )
+                input.form-control.me-2(
+                    type="datetime-local",
+                    name="start",
+                    required
+                )
+                input.form-control.me-2(
+                    type="datetime-local",
+                    name="end",
+                    required
+                )
+                button.btn.btn-primary(type="submit") Забронировать
+
+    //- Как это работает
+    .how-it-works.py-5
+        .container
+            h2.text-center.mb-5 Как это работает
+            .row.text-center
+                .col-md-3
+                    i.bi.bi-1-circle.display-4.mb-2
+                    h5 Введите зону
+                    p Номер обозначен на табличке у парковочного места.
+                .col-md-3
+                    i.bi.bi-2-circle.display-4.mb-2
+                    h5 Выберите время
+                    p Задайте время въезда и выезда.
+                .col-md-3
+                    i.bi.bi-3-circle.display-4.mb-2
+                    h5 Подтвердите бронь
+                    p Наш оператор одобрит ваш запрос.
+                .col-md-3
+                    i.bi.bi-4-circle.display-4.mb-2
+                    h5 Наслаждайтесь
+                    p Паркуйтесь и оплачивайте через приложение.
+
+block scripts
+    //- Скрипт для обработки формы поиска
+    script(src="/static/js/dashboard.js")

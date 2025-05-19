@@ -1,4 +1,4 @@
-const { Zone, Tariff, Log } = require('../models/models');
+const { Zone, Tariff, Log } = require('../models/Models');
 class ZoneService {
     async getAll() { return Zone.findAll({ include: [Tariff] }); }
     async getById(id) { return Zone.findByPk(id, { include: [Tariff] }); }

@@ -1,4 +1,4 @@
-const { ParkingSlot, Log } = require('../models/models');
+const { ParkingSlot, Log } = require('../models/Models');
 
 class ParkingSlotService {
     async getAll() { return ParkingSlot.findAll(); }

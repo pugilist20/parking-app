@@ -1,4 +1,6 @@
-const { User, Log } = require('../models/models');
+const { User, Log } = require('../models/Models');
+const bcrypt = require('bcrypt');
+
 class UserService {
     async getAll() {
         return User.findAll({ attributes: { exclude: ['password'] } });
@@ -21,6 +23,40 @@ class UserService {
         await user.destroy();
         await Log.create({ user_id: userId, action: `Deleted user ${id}` });
         return user;
+    }
+    async create(data, creatorId) {
+        const { username, password, fullname, email, role } = data;
+
+        if (!username || !password || !email || !role) {
+            const err = new Error('username, password, email и role обязательны');
+            err.status = 400;
+            throw err;
+        }
+
+        // Проверяем, нет ли уже такого
+        if (await User.findOne({ where: { username } })) {
+            const err = new Error('Пользователь с таким именем уже существует');
+            err.status = 409;
+            throw err;
+        }
+
+        const hash = await bcrypt.hash(password, 10);
+        const user = await User.create({
+            username,
+            password: hash,
+            fullname,
+            email,
+            role  // роль может быть 'admin','employee','user','guest'
+        });
+
+        await Log.create({
+            user_id: creatorId,
+            action: `Created user ${user.id} with role ${role}`
+        });
+
+        // не возвращаем пароль
+        const { password: _, ...safe } = user.get({ plain: true });
+        return safe;
     }
 }
 module.exports.UserService = UserService;

@@ -4,7 +4,7 @@
   "scripts": {
     "start": "node server/app.js",
     "dev": "nodemon server/app.js",
-    "test": "mocha client/test"
+    "test": "mocha --recursive --exit"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -19,8 +19,9 @@
     "sequelize": "^6.37.7"
   },
   "devDependencies": {
-    "chai": "^4.3.7",
-    "mocha": "^10.2.0",
-    "nodemon": "^3.0.2"
+    "chai": "^4.5.0",
+    "mocha": "^10.8.2",
+    "nodemon": "^3.0.2",
+    "supertest": "^7.1.1"
   }
 }

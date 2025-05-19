@@ -1,6 +1,6 @@
 const sequelize = require('../db');
 const { Op } = require('sequelize');
-const { Booking, ParkingSlot, Log } = require('../models/models');
+const { Booking, ParkingSlot, Log } = require('../models/Models');
 
 class BookingService {
     async getAll() { return Booking.findAll({ include: [ParkingSlot] }); }
@@ -21,23 +21,29 @@ class BookingService {
         return !overlap;
     }
 
-    async create(data, userId) {
-        return sequelize.transaction(async t => {
-            const available = await this.checkAvailability(data.parking_slot_id, data.start_time, data.end_time);
-            if (!available) throw new Error('Slot not available for selected time');
-            const booking = await Booking.create({
-                user_id: userId,
-                parking_slot_id: data.parking_slot_id,
-                start_time: data.start_time,
-                end_time: data.end_time
-            }, { transaction: t });
-            await ParkingSlot.update({ status: 'reserved' }, { where: { id: data.parking_slot_id }, transaction: t });
-            await Log.create({ user_id: userId, action: `Created booking ${booking.id}` }, { transaction: t });
-            return booking;
+    async createBooking({ userId, parking_slot_id, start_time, end_time }) {
+        const slot = await ParkingSlot.findByPk(parking_slot_id);
+        if (!slot) {
+            throw new Error('Slot not found');
+        }
+
+        const booking = await Booking.create({
+            user_id: userId,
+            parking_slot_id,
+            start_time,
+            end_time,
+            status: 'pending'
         });
+
+        await Log.create({
+            user_id: userId,
+            action: `Created booking ${booking.id} for slot ${parking_slot_id}`
+        });
+
+        return booking;
     }
 
-    async approve(id, userId) {
+    async approveBooking(id, userId) {
         return sequelize.transaction(async t => {
             const booking = await Booking.findByPk(id, { transaction: t });
             if (!booking) throw new Error('Booking not found');
@@ -48,7 +54,7 @@ class BookingService {
         });
     }
 
-    async reject(id, userId) {
+    async rejectBooking(id, userId) {
         return sequelize.transaction(async t => {
             const booking = await Booking.findByPk(id, { transaction: t });
             if (!booking) throw new Error('Booking not found');
@@ -60,7 +66,7 @@ class BookingService {
     }
 
     // Отмена бронирования пользователем до одобрения
-    async cancel(id, userId) {
+    async cancelBooking(id, userId) {
         return sequelize.transaction(async t => {
             const booking = await Booking.findByPk(id, { transaction: t });
             if (!booking) throw new Error('Booking not found');

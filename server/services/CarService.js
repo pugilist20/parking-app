@@ -1,6 +1,6 @@
 const sequelize = require('../db');
 const { Op } = require('sequelize');
-const { Car, ParkingSlot, Log } = require('../models/models');
+const { Car, ParkingSlot, Log } = require('../models/Models');
 
 class CarService {
     // Получить все машины с информацией о месте
@@ -30,11 +30,30 @@ class CarService {
     // Создание машины и захват места с проверкой целостности
     async create(data, userId) {
         return sequelize.transaction(async t => {
+            // 1. Проверяем слот
             const slot = await ParkingSlot.findByPk(data.parking_slot_id, { transaction: t });
-            if (!slot || slot.status !== 'free') throw new Error('Slot not available');
-            const car = await Car.create(data, { transaction: t });
+            if (!slot || slot.status !== 'free') {
+                throw new Error('Slot not available');
+            }
+
+            // 2. Собираем полный объект для создания машины
+            const carData = {
+                ...data,
+                user_id: userId,               // <-- вот сюда
+            };
+
+            // 3. Создаём автомобиль
+            const car = await Car.create(carData, { transaction: t });
+
+            // 4. Меняем статус слота
             await slot.update({ status: 'occupied' }, { transaction: t });
-            await Log.create({ user_id: userId, action: `Created car ${car.id}` }, { transaction: t });
+
+            // 5. Логируем
+            await Log.create({
+                user_id: userId,
+                action: `Created car ${car.id}`
+            }, { transaction: t });
+
             return car;
         });
     }

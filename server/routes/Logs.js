@@ -1,0 +1,14 @@
+const express = require('express');
+const { authMiddleware, roleCheck } = require('../middlewares/authMiddleware');
+const { LogService } = require('../services/LogService');
+const LogController = require('../controllers/LogController');
+
+const router = express.Router();
+const logService = new LogService();
+const logController = new LogController(logService);
+
+router.use(roleCheck(['admin']));
+router.get('/', logController.getAll);
+router.get('/user/:userId', logController.getByUser);
+
+module.exports = router;
