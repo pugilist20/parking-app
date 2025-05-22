@@ -34,36 +34,44 @@ class ParkingSlotService {
 
     async getZonesAvailability(start, end) {
         const startDt = new Date(start);
-        const endDt   = new Date(end);
+        const endDt = new Date(end);
 
         const zones = await Zone.findAll({
             include: [
-                { model: Tariff, attributes: ['price_per_hour'] },
+                // подключаем тариф, чтобы вернуть цену
+                {model: Tariff, attributes: ['price_per_hour']},
                 {
                     model: ParkingSlot,
+                    attributes: ['id', 'status'],
                     include: [{
                         model: Booking,
                         where: {
-                            status: 'approved',
-                            start_time: { [Op.lt]: endDt },
-                            end_time:   { [Op.gt]: startDt }
+                            status: 'approved',            // только утверждённые брони
+                            start_time: {[Op.lt]: endDt},
+                            end_time: {[Op.gt]: startDt}
                         },
-                        required: false
+                        required: false,
+                        attributes: ['id']
                     }]
                 }
             ]
         });
 
         return zones.map(z => {
-            const total = z.parking_slots.length;
-            // свободными считаем только те, у которых нет approved-броней
-            const free  = z.parking_slots.filter(s => s.bookings.length === 0).length;
+            const slots = z.parking_slots;
+            const total = slots.length;
+            // свободными считаем только те со status==='free' и без approved-броней
+            const freeSlots = slots.filter(s =>
+                s.status === 'free' && s.bookings.length === 0
+            );
+
             return {
-                id:            z.id,
-                name:          z.name,
-                totalCount:    total,
-                freeCount:     free,
-                pricePerHour:  z.tariff.price_per_hour
+                id: z.id,
+                name: z.name,
+                pricePerHour: z.tariff.price_per_hour,   // теперь есть
+                totalCount: total,
+                freeCount: freeSlots.length,
+                freeSlotIds: freeSlots.map(s => s.id)  // первый свободный слот можно взять [0]
             };
         });
     }

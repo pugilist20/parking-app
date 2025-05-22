@@ -1,12 +1,21 @@
 // client/public/js/dashboard.js
-$(function(){
-    $('#searchForm').on('submit', async function(e){
+
+$(function() {
+    // 1) Обработка формы поиска свободных зон
+    $('#searchForm').on('submit', async function(e) {
         e.preventDefault();
         $('#zoneResults').empty();
 
         const start = $('#start').val();
         const end   = $('#end').val();
-        // ...валидация таймингов...
+
+        // Валидация: обе даты должны быть заполнены и end > start
+        if (!start || !end) {
+            return alert('Пожалуйста, выберите оба времени начала и конца.');
+        }
+        if (new Date(end) <= new Date(start)) {
+            return alert('Дата окончания должна быть позже даты начала.');
+        }
 
         try {
             const zones = await api(
@@ -25,11 +34,13 @@ $(function(){
             }
 
             zones.forEach(z => {
-                // строим кнопку «Забронировать» только если есть свободные
-                const bookBtn = z.freeCount > 0
+                // список свободных слотов в зоне
+                const freeIds = z.freeSlotIds || [];
+                // кнопка или сообщение об отсутствии
+                const bookBtn = freeIds.length
                     ? `<button
                class="btn btn-primary mt-auto book-zone-btn"
-               data-zone-id="${z.id}"
+               data-free-slot-ids='${JSON.stringify(freeIds)}'
                data-start="${start}"
                data-end="${end}"
              >
@@ -55,18 +66,36 @@ $(function(){
           </div>
         `);
             });
+
         } catch (err) {
             console.error('Ошибка поиска зон:', err);
-            alert('Не удалось выполнить поиск');
+            alert('Не удалось выполнить поиск зон.');
         }
     });
 
-    // Обработчик клика по кнопке «Забронировать» остаётся прежним
-    $('#zoneResults').on('click', '.book-zone-btn', function() {
-        const zoneId = $(this).data('zone-id');
-        const start  = $(this).data('start');
-        const end    = $(this).data('end');
-        window.location.href =
-            `/bookings?zone=${zoneId}&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+    // 2) Обработчик клика по кнопке «Забронировать»
+    $('#zoneResults').on('click', '.book-zone-btn', async function() {
+        const freeIds = JSON.parse($(this).attr('data-free-slot-ids'));
+        const slotId  = freeIds[0];             // первый свободный слот
+        const start   = $(this).data('start');
+        const end     = $(this).data('end');
+
+        if (!slotId) {
+            return alert('Ошибка: не найден свободный слот.');
+        }
+
+        try {
+            await api('POST', '/api/bookings', {
+                parking_slot_id: slotId,
+                start_time:      start,
+                end_time:        end
+            });
+            // После успешного создания перенаправляем на список броней
+            window.location.href = '/bookings';
+        } catch (err) {
+            console.error('Ошибка создания брони:', err);
+            const msg = err.responseJSON?.message || 'Не удалось забронировать слот.';
+            alert(msg);
+        }
     });
 });

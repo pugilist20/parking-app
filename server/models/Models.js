@@ -61,7 +61,7 @@ const Zone = sequelize.define('zone', {
 const ParkingSlot = sequelize.define('parking_slot', {
     id:           { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     slot_number:  { type: DataTypes.INTEGER, unique: true, allowNull: false },
-    status:       { type: DataTypes.ENUM('free','occupied','reserved'), defaultValue: 'free' },
+    status:       { type: DataTypes.ENUM('free','occupied'), defaultValue: 'free' },
     zone_id:      { type: DataTypes.INTEGER, allowNull: false }
 }, {
     timestamps: false

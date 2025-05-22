@@ -14,6 +14,7 @@ router.get('/', controller.getAll);
 // 2️⃣ Всё остальное — только админ
 router.use(roleCheck(['admin']));
 router.post('/',   controller.create);
+router.put('/:id', roleCheck(['admin']), controller.update);
 router.delete('/:id', controller.delete);
 
 module.exports = router;

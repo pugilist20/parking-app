@@ -32,7 +32,7 @@ class CarService {
         return sequelize.transaction(async t => {
             // 1. Проверяем слот
             const slot = await ParkingSlot.findByPk(data.parking_slot_id, { transaction: t });
-            if (!slot || !['free', 'reserved'].includes(slot.status)) {
+            if (!slot || !['free'].includes(slot.status)) {
                 const e = new Error('Slot is not available');
                 e.status = 400;
                 throw e;
