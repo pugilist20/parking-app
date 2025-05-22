@@ -1,22 +1,19 @@
 // server/routes/Zones.js
-const express = require('express');
-const { authMiddleware, roleCheck } = require('../middlewares/AuthMiddleware');
-const { ZoneService } = require('../services/ZoneService');
+const express        = require('express');
 const ZoneController = require('../controllers/ZoneController');
+const { ZoneService }= require('../services/ZoneService');
+const { roleCheck }  = require('../middlewares/AuthMiddleware');
 
 const router = express.Router();
+const service    = new ZoneService();
+const controller = new ZoneController(service);
 
-// Инициализируем сервис и контроллер
-const zoneService = new ZoneService();
-const zoneController = new ZoneController(zoneService);
+// 1️⃣ Доступно всем залогиненным: получить список зон
+router.get('/', controller.getAll);
 
-// Доступ к зонам — только admin и employee
-router.use(roleCheck(['admin', 'employee']));
-
-router.get('/',      zoneController.getAll);
-router.get('/:id',   zoneController.getById);
-router.post('/',     zoneController.create);
-router.put('/:id',   zoneController.update);
-router.delete('/:id',zoneController.delete);
+// 2️⃣ Всё остальное — только админ
+router.use(roleCheck(['admin']));
+router.post('/',   controller.create);
+router.delete('/:id', controller.delete);
 
 module.exports = router;

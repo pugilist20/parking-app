@@ -1,53 +1,22 @@
 extends layout
 
 block content
-    //- Герой-секция: поиск по зоне
-    .hero.py-5
-        .overlay
-        .container.text-center
-            h1.mb-4.text-black Park. Pay. Go.
-            p.lead.mb-4.text-black Бесплатное бронирование парковки заранее или оплата по факту
-            form#searchForm.d-flex.justify-content-center
-                input.form-control.w-50.me-2(
-                    type="text",
-                    name="zone",
-                    placeholder="Введите номер зоны",
-                    required
-                )
-                input.form-control.me-2(
-                    type="datetime-local",
-                    name="start",
-                    required
-                )
-                input.form-control.me-2(
-                    type="datetime-local",
-                    name="end",
-                    required
-                )
-                button.btn.btn-primary(type="submit") Забронировать
-
-    //- Как это работает
-    .how-it-works.py-5
+    .py-5.bg-white
         .container
-            h2.text-center.mb-5 Как это работает
-            .row.text-center
-                .col-md-3
-                    i.bi.bi-1-circle.display-4.mb-2
-                    h5 Введите зону
-                    p Номер обозначен на табличке у парковочного места.
-                .col-md-3
-                    i.bi.bi-2-circle.display-4.mb-2
-                    h5 Выберите время
-                    p Задайте время въезда и выезда.
-                .col-md-3
-                    i.bi.bi-3-circle.display-4.mb-2
-                    h5 Подтвердите бронь
-                    p Наш оператор одобрит ваш запрос.
-                .col-md-3
-                    i.bi.bi-4-circle.display-4.mb-2
-                    h5 Наслаждайтесь
-                    p Паркуйтесь и оплачивайте при выезде.
+            h1.text-center.mb-4.text-primary Park. Pay. Go.
+            p.lead.text-center.mb-5 Введите диапазон времени и узнайте, в каких зонах есть свободные места.
+            form#searchForm.row.g-2.justify-content-center
+                .col-auto
+                    input.form-control(type="datetime-local" id="start" name="start" required)
+                .col-auto
+                    input.form-control(type="datetime-local" id="end"   name="end"   required)
+                .col-auto
+                    button.btn.btn-primary(type="submit")
+                        i.bi.bi-search.me-1
+                        | Найти
+
+    .container.mt-4
+        #zoneResults.row.g-4
 
 block scripts
-    //- Скрипт для обработки формы поиска
     script(src="/static/js/dashboard.js")

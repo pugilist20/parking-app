@@ -14,6 +14,6 @@ router.get('/filter',     carController.filter);
 router.post('/',          roleCheck(['admin','employee']), carController.create);
 router.post('/release/:id', roleCheck(['admin','employee']), carController.release);
 router.put('/:id',        roleCheck(['admin','employee']), carController.update);
-router.delete('/:id',     roleCheck(['admin']),           carController.delete);
+router.delete('/:id',     roleCheck(['admin','employee']),           carController.delete);
 
 module.exports = router;

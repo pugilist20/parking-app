@@ -9,7 +9,11 @@ const sequelize = new Sequelize(
         host: dbConfig.host,
         port: dbConfig.port,
         dialect: dbConfig.dialect,
-        logging: dbConfig.logging
+        logging: dbConfig.logging,
+        timezone: '+03:00',
+        dialectOptions: {
+            useUTC: true,
+        },
     }
 );
 

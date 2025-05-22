@@ -32,8 +32,10 @@ class CarService {
         return sequelize.transaction(async t => {
             // 1. Проверяем слот
             const slot = await ParkingSlot.findByPk(data.parking_slot_id, { transaction: t });
-            if (!slot || slot.status !== 'free') {
-                throw new Error('Slot not available');
+            if (!slot || !['free', 'reserved'].includes(slot.status)) {
+                const e = new Error('Slot is not available');
+                e.status = 400;
+                throw e;
             }
 
             // 2. Собираем полный объект для создания машины
@@ -87,6 +89,8 @@ class CarService {
         return sequelize.transaction(async t => {
             const car = await Car.findByPk(id, { transaction: t });
             if (!car) throw new Error('Car not found');
+            const slot = await ParkingSlot.findByPk(car.parking_slot_id, { transaction: t });
+            if (slot) await slot.update({ status: 'free' }, { transaction: t });
             await car.destroy({ transaction: t });
             await Log.create({ user_id: userId, action: `Deleted car ${id}` }, { transaction: t });
             return car;

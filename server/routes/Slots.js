@@ -1,19 +1,26 @@
-const express = require('express');
-const { authMiddleware, roleCheck } = require('../middlewares/authMiddleware');
-const ParkingSlotController = require('../controllers/ParkingSlotController');
+// server/routes/Slots.js
+const express                = require('express');
+const ParkingSlotController  = require('../controllers/ParkingSlotController');
+const { ParkingSlotService } = require('../services/ParkingSlotService');
+const { roleCheck, authMiddleware } = require('../middlewares/AuthMiddleware');
 
 const router = express.Router();
-const { ParkingSlotService } = require('../services/ParkingSlotService');
-const slotService = new ParkingSlotService();
-const slotController = new ParkingSlotController(slotService);
+router.use(authMiddleware); // все маршруты требуют авторизации
 
-router.use(roleCheck(['admin','employee','user']));
-router.get('/',           slotController.getAll);
-router.get('/free',       slotController.getFree);
-router.get('/occupied',   slotController.getOccupied);
-router.get('/zone/:zoneId', slotController.getByZone);
-router.post('/',          slotController.create);
-router.put('/:id',        slotController.update);
-router.delete('/:id',     slotController.delete);
+const service    = new ParkingSlotService();
+const controller = new ParkingSlotController(service);
+
+// доступно любому залогиненному
+router.get('/free',         controller.getFree);
+router.get('/occupied',     controller.getOccupied);
+router.get('/zone/:zoneId', controller.getByZone);
+router.get('/availability', controller.checkAvailability);
+
+// остальное — только employee/admin
+router.use(roleCheck(['employee','admin']));
+router.get('/',    controller.getAll);
+router.post('/',   controller.create);
+router.put('/:id', controller.update);
+router.delete('/:id', controller.delete);
 
 module.exports = router;

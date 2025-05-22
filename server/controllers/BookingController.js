@@ -15,16 +15,14 @@ class BookingController {
     // POST /api/bookings
     async createBooking(req, res, next) {
         try {
-            const { parking_slot_id, start_time, end_time } = req.body;
-            const booking = await this.bookingService.createBooking({
-                userId: req.user.id,
-                parking_slot_id,
-                start_time,
-                end_time
-            });
+            const userId = req.user.id;
+            const {parking_slot_id, start_time, end_time} = req.body;
+            const booking = await this.bookingService.createBooking({userId, parking_slot_id, start_time, end_time});
             return res.status(201).json(booking);
         } catch (err) {
-            next(err);
+            // если в err.status записан код, возвращаем его
+            const status = err.status || 500;
+            return res.status(status).json({message: err.message});
         }
     }
 
