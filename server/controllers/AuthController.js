@@ -1,4 +1,3 @@
-// server/controllers/AuthController.js
 const AuthService = require('../services/AuthService');
 
 class AuthController {
@@ -8,7 +7,7 @@ class AuthController {
         this.login       = this.login.bind(this);
     }
 
-    // POST /api/auth/register
+    
     async register(req, res) {
         try {
             const { token } = await this.authService.register(req.body);
@@ -18,7 +17,7 @@ class AuthController {
         }
     }
 
-    // POST /api/auth/login
+    
     async login(req, res) {
         try {
             const { token } = await this.authService.login(req.body);

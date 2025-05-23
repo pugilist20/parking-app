@@ -1,16 +1,13 @@
-// server/services/AuthService.js
 const bcrypt = require('bcrypt');
 const jwt    = require('jsonwebtoken');
 const { User } = require('../models/Models');
 require('dotenv').config();
-
 class AuthService {
     constructor() {
         this.userModel   = User;
         this.jwtSecret   = process.env.JWT_SECRET;
         this.jwtExpiresIn= process.env.JWT_EXPIRES_IN;
     }
-
     async register({ username, password, fullname, email }) {
         if (!username || !password || !email) {
             const err = new Error('username, password и email обязательны');
@@ -37,7 +34,6 @@ class AuthService {
         );
         return { token };
     }
-
     async login({ username, password }) {
         if (!username || !password) {
             const err = new Error('username и password обязательны');
@@ -58,5 +54,4 @@ class AuthService {
         return { token };
     }
 }
-
 module.exports.AuthService = AuthService;

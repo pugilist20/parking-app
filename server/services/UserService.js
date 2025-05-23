@@ -1,9 +1,10 @@
 const { User, Log } = require('../models/Models');
 const bcrypt = require('bcrypt');
-
 class UserService {
-    async getAll() {
-        return User.findAll({ attributes: { exclude: ['password'] } });
+    async getAll({ id }) {
+        const where = {};
+        if (id) where.id = id;
+        return User.findAll({ where });
     }
     async getById(id) {
         return User.findByPk(id, { attributes: { exclude: ['password'] } });
@@ -32,29 +33,23 @@ class UserService {
             err.status = 400;
             throw err;
         }
-
-        // Проверяем, нет ли уже такого
         if (await User.findOne({ where: { username } })) {
             const err = new Error('Пользователь с таким именем уже существует');
             err.status = 409;
             throw err;
         }
-
         const hash = await bcrypt.hash(password, 10);
         const user = await User.create({
             username,
             password: hash,
             fullname,
             email,
-            role  // роль может быть 'admin','employee','user'
+            role  
         });
-
         await Log.create({
             user_id: creatorId,
             action: `Created user ${user.id} with role ${role}`
         });
-
-        // не возвращаем пароль
         const { password: _, ...safe } = user.get({ plain: true });
         return safe;
     }

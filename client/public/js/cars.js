@@ -1,14 +1,15 @@
-// client/public/js/cars.js
 $(function() {
     const $tableBody = $('#carsTableBody');
     const $modal     = $('#carModal');
     const $form      = $('#carForm');
     const $label     = $('#carModalLabel');
-
-    // 1) Загрузить и показать все машины
-    async function loadCars() {
+    const $search    = $('#carSearch');
+    async function loadCars(filter = '') {
         try {
-            const cars = await api('GET', '/api/cars');
+            const url = filter
+                ? `/api/cars/filter?license_plate=${encodeURIComponent(filter)}`
+                : '/api/cars';
+            const cars = await api('GET', url);
             $tableBody.empty();
             cars.forEach(c => {
                 $tableBody.append(`
@@ -16,8 +17,8 @@ $(function() {
             <td>${c.id}</td>
             <td>${c.license_plate}</td>
             <td>${c.model}</td>
-            <td>${c.entry_time || ''}</td>
-            <td>${c.exit_time || ''}</td>
+            <td>${c.entry_time||''}</td>
+            <td>${c.exit_time||''}</td>
             <td>${c.parking_slot_id}</td>
             <td>
               <button class="btn btn-sm btn-primary edit-btn">✎</button>
@@ -27,21 +28,22 @@ $(function() {
           </tr>
         `);
             });
-        } catch (err) {
+        } catch {
             alert('Ошибка загрузки автомобилей');
         }
     }
-
     loadCars();
-
-    // 2) Открыть модалку «Добавить»
+    let timeout;
+    $search.on('input', function(){
+        clearTimeout(timeout);
+        const q = this.value.trim();
+        timeout = setTimeout(() => loadCars(q), 300);
+    });
     $('#addCarBtn').on('click', () => {
         $label.text('Добавить автомобиль');
         $form[0].reset();
         $('#carId').val('');
     });
-
-    // 3) Открыть модалку «Редактировать»
     $tableBody.on('click', '.edit-btn', function() {
         const $tr = $(this).closest('tr');
         const id  = $tr.data('id');
@@ -52,8 +54,6 @@ $(function() {
         $('#parking_slot_id').val($tr.find('td').eq(5).text());
         $modal.modal('show');
     });
-
-    // 4) Сохранить (создать или обновить)
     $form.on('submit', async function(e) {
         e.preventDefault();
         const id = $('#carId').val();
@@ -74,8 +74,6 @@ $(function() {
             alert(err.responseJSON?.message || 'Ошибка сохранения');
         }
     });
-
-    // 5) Release и Delete
     $tableBody.on('click', '.release-btn', async function() {
         const id = $(this).closest('tr').data('id');
         try {
@@ -85,7 +83,6 @@ $(function() {
             alert('Ошибка освобождения слота');
         }
     });
-
     $tableBody.on('click', '.delete-btn', async function() {
         if (!confirm('Удалить эту машину?')) return;
         const id = $(this).closest('tr').data('id');

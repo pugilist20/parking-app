@@ -1,17 +1,14 @@
 const express = require('express');
 const { authMiddleware, roleCheck } = require('../middlewares/authMiddleware');
 const TariffController = require('../controllers/TariffController');
-
 const router = express.Router();
 const { TariffService } = require('../services/TariffService');
 const tariffService = new TariffService();
 const tariffController = new TariffController(tariffService);
-
 router.use(roleCheck(['admin']));
 router.get('/',    tariffController.getAll);
 router.get('/:id', tariffController.getById);
 router.post('/',   tariffController.create);
 router.put('/:id', tariffController.update);
 router.delete('/:id', tariffController.delete);
-
 module.exports = router;

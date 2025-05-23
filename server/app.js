@@ -1,4 +1,3 @@
-// server/app.js
 const express = require('express');
 const path    = require('path');
 
@@ -18,20 +17,20 @@ const logRoutes     = require('./routes/Logs');
 
 const app = express();
 
-// Pug и статика
+
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, '../client/views'));
 app.use('/static', express.static(path.join(__dirname, '../client/public')));
 app.use(express.json());
 
-// ——— Публичные страницы —–
-// без какой-либо server-side проверки
+
+
 app.get('/',         (req, res) => res.redirect('/login'));
 app.get('/login',    (req, res) => res.render('login',    { pageTitle: 'Вход',        showNav: false }));
 app.get('/register', (req, res) => res.render('register', { pageTitle: 'Регистрация', showNav: false }));
 
-// ——— Все клиентские страницы (Pug) —–
-// рендерятся без authMiddleware, клиент сам проверяет токен
+
+
 app.get('/dashboard', (req, res) =>
     res.render('dashboard', { pageTitle: 'Дашборд',      showNav: true })
 );
@@ -54,11 +53,8 @@ app.get('/users',     (req, res) =>
     res.render('users',     { pageTitle: 'Пользователи', showNav: true })
 );
 
-// ——— API-маршруты —–
-// доступ к /api/auth без токена
 app.use('/api/auth', authRoutes);
 
-// всё остальное под /api/* требует JWT
 app.use('/api', authMiddleware);
 
 app.use('/api/users',    userRoutes);
@@ -69,10 +65,10 @@ app.use('/api/cars',     carRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/logs',     logRoutes);
 
-// Health-check
+
 app.get('/health', (req, res) => res.json({ status: 'OK' }));
 
-// Запуск сервера
+
 if (require.main === module) {
     initDB()
         .then(() => app.listen(config.port, () => {

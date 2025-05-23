@@ -1,13 +1,11 @@
 $(function() {
     const $tbody  = $('#slotsTableBody');
+    const $search = $('#slotSearch');
     const $modal  = $('#slotModal');
     const $form   = $('#slotForm');
     const $label  = $('#slotModalLabel');
     const $selectZone = $('#zone_id');
-
     let zones = [];
-
-    // Загрузить список зон для выпадающего списка
     async function loadZones() {
         try {
             zones = await api('GET', '/api/zones');
@@ -23,11 +21,12 @@ $(function() {
             alert('Не удалось загрузить зоны');
         }
     }
-
-    // Загрузить слоты и отрендерить таблицу
-    async function loadSlots() {
+    async function loadSlots(filter = '') {
         try {
-            const slots = await api('GET', '/api/slots');
+            const url = filter
+                ? `/api/slots?slot_number=${encodeURIComponent(filter)}`
+                : '/api/slots';
+            const slots = await api('GET', url);
             $tbody.empty();
             slots.forEach(s => {
                 $tbody.append(`
@@ -47,21 +46,22 @@ $(function() {
             alert('Ошибка загрузки слотов');
         }
     }
-
-    // Инициализация
+    loadSlots();
+    let timeout;
+    $search.on('input', function(){
+        clearTimeout(timeout);
+        const q = this.value.trim();
+        timeout = setTimeout(() => loadSlots(q), 200);
+    });
     (async function init() {
         await loadZones();
         await loadSlots();
     })();
-
-    // Открываем модалку «Добавить»
     $('#addSlotBtn').on('click', () => {
         $label.text('Добавить слот');
         $form[0].reset();
         $('#slotId').val('');
     });
-
-    // Открываем модалку «Редактировать»
     $tbody.on('click', '.edit-slot', function() {
         const $tr   = $(this).closest('tr');
         const id    = $tr.data('id');
@@ -76,8 +76,6 @@ $(function() {
         $('#status').val(status);
         $modal.modal('show');
     });
-
-    // Сохранение (POST или PUT)
     $form.on('submit', async function(e) {
         e.preventDefault();
         const id = $('#slotId').val();
@@ -98,8 +96,6 @@ $(function() {
             alert(err.responseJSON?.message || 'Ошибка сохранения слота');
         }
     });
-
-    // Удаление
     $tbody.on('click', '.delete-slot', async function() {
         if (!confirm('Удалить слот?')) return;
         const id = $(this).closest('tr').data('id');

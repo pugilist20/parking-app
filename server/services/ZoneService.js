@@ -1,6 +1,13 @@
 const { Zone, Tariff, Log } = require('../models/Models');
+const {Op} = require("sequelize");
 class ZoneService {
-    async getAll() { return Zone.findAll({ include: [Tariff] }); }
+    async getAll({ name }) {
+        const where = {};
+        if (name) {
+            where.name = { [Op.iLike]: `%${name}%` };
+        }
+        return Zone.findAll({ where });
+    }
     async getById(id) { return Zone.findByPk(id, { include: [Tariff] }); }
     async create(data, userId) {
         const zone = await Zone.create({ name: data.name, tariff_id: data.tariff_id });

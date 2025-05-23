@@ -1,14 +1,11 @@
-// client/public/js/zones.js
 $(function() {
     const $tbody    = $('#zonesTableBody');
     const $modal    = $('#zoneModal');
     const $form     = $('#zoneForm');
     const $label    = $('#zoneModalLabel');
     const $tariffSel= $('#tariff_id');
-
+    const $search = $('#zoneSearch');
     let tariffs = [];
-
-    // Загрузка тарифов для селекта
     async function loadTariffsList() {
         try {
             tariffs = await api('GET', '/api/tariffs');
@@ -22,13 +19,15 @@ $(function() {
             alert('Не удалось загрузить тарифы');
         }
     }
-
-    // Загрузка и рендер зон
-    async function loadZones() {
+    async function loadZones(filter='') {
         try {
-            const zones = await api('GET', '/api/zones');
+            const base = '/api/zones';
+            const url  = filter
+                ? `${base}?name=${encodeURIComponent(filter)}`
+                : base;
+            const list = await api('GET', url);
             $tbody.empty();
-            zones.forEach(z => {
+            list.forEach(z => {
                 $tbody.append(`
           <tr data-id="${z.id}">
             <td>${z.id}</td>
@@ -45,21 +44,22 @@ $(function() {
             alert('Ошибка загрузки зон');
         }
     }
-
-    // Инициализация
+    loadZones();
+    let timeout;
+    $search.on('input', function(){
+        clearTimeout(timeout);
+        const q = this.value.trim();
+        timeout = setTimeout(() => loadZones(q), 200);
+    });
     (async function init() {
         await loadTariffsList();
         await loadZones();
     })();
-
-    // Открыть модалку «Добавить»
     $('#addZoneBtn').on('click', () => {
         $label.text('Добавить зону');
         $form[0].reset();
         $('#zoneId').val('');
     });
-
-    // Открыть модалку «Редактировать»
     $tbody.on('click', '.edit-zone', function() {
         const $tr = $(this).closest('tr');
         const id  = $tr.data('id');
@@ -70,8 +70,6 @@ $(function() {
         $('#tariff_id').val(cols.eq(2).text());
         $modal.modal('show');
     });
-
-    // Сохранение (POST/PUT)
     $form.on('submit', async function(e) {
         e.preventDefault();
         const id = $('#zoneId').val();
@@ -92,8 +90,6 @@ $(function() {
             alert(err.responseJSON?.message || 'Ошибка сохранения зоны');
         }
     });
-
-    // Удаление
     $tbody.on('click', '.delete-zone', async function() {
         if (!confirm('Удалить зону?')) return;
         const id = $(this).closest('tr').data('id');

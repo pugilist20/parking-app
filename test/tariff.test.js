@@ -3,12 +3,10 @@ const requestTariff = require('supertest');
 const { expect: expT } = require('chai');
 const appTariff    = require('../server/app');
 const initDBTariff = require('../server/models/Init');
-
 describe('Tariff API', function() {
     this.timeout(5000);
     let adminToken;
     let created;
-
     before(async () => {
         await initDBTariff();
         await requestTariff(appTariff).post('/api/auth/register')
@@ -20,7 +18,6 @@ describe('Tariff API', function() {
             .send({ username: 'adm3', password: 'Admin123' });
         adminToken = login.body.token;
     });
-
     it('POST /api/tariffs creates tariff', () =>
         requestTariff(appTariff)
             .post('/api/tariffs')
@@ -29,7 +26,6 @@ describe('Tariff API', function() {
             .expect(201)
             .then(res => { created = res.body; expT(created).to.include({ name: 'T1' }); })
     );
-
     it('GET /api/tariffs returns array', () =>
         requestTariff(appTariff)
             .get('/api/tariffs')
@@ -37,7 +33,6 @@ describe('Tariff API', function() {
             .expect(200)
             .then(res => expT(res.body).to.be.an('array'))
     );
-
     it('DELETE /api/tariffs/:id deletes tariff', () =>
         requestTariff(appTariff)
             .delete(`/api/tariffs/${created.id}`)

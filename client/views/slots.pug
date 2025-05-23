@@ -1,12 +1,11 @@
 extends layout
-
 block content
     .d-flex.justify-content-between.align-items-center.mb-4
         h1.mb-0 Слоты
+        input#slotSearch.form-control.w-25(type="number" placeholder="Поиск по номеру…")
         button.btn.btn-success#addSlotBtn(type="button" data-bs-toggle="modal" data-bs-target="#slotModal")
             i.bi.bi-plus-lg.me-1
             | Добавить слот
-
     table.table.table-hover
         thead
             tr
@@ -16,8 +15,6 @@ block content
                 th Статус
                 th Действия
         tbody#slotsTableBody
-
-    //– Модальное окно для добавления / редактирования слота
     .modal.fade#slotModal(tabindex="-1" aria-hidden="true")
         .modal-dialog
             .modal-content
@@ -42,6 +39,5 @@ block content
                 .modal-footer
                     button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Отмена
                     button.btn.btn-primary(type="submit" form="slotForm") Сохранить
-
 block scripts
     script(src="/static/js/slots.js")

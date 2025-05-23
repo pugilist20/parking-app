@@ -1,19 +1,16 @@
-// client/public/js/bookings.js
 $(function() {
     const $tbody   = $('#bookingsTableBody');
     const $modal   = $('#bookingModal');
     const $form    = $('#bookingForm');
     const $slotSel = $('#parking_slot_id');
     const $addBtn  = $('#addBookingBtn');
-
-    // Утилита для декодирования Base64URL JWT
+    const $search  = $('#bookingSearch');
+    let allBookings = [];
     function parseJwt(token) {
         const base64Url = token.split('.')[1];
         const base64    = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         return JSON.parse(window.atob(base64));
     }
-
-    // Определяем роль из токена
     let role = null;
     const token = localStorage.getItem('token');
     if (token) {
@@ -23,8 +20,6 @@ $(function() {
             console.error('JWT parse error:', e);
         }
     }
-
-    // --- Авто-бронирование из Dashboard ---
     (async function autoBook() {
         const params = new URLSearchParams(window.location.search);
         if (params.has('zone') && params.has('start') && params.has('end')) {
@@ -32,14 +27,11 @@ $(function() {
             const start  = params.get('start');
             const end    = params.get('end');
             try {
-                // 1) Получаем все слоты в зоне
                 const slots = await api('GET', `/api/slots/zone/${zoneId}`);
-                // 2) Фильтруем свободные
                 const free = slots.filter(s => s.status === 'free');
                 if (!free.length) {
                     alert('Нет свободных слотов в выбранной зоне');
                 } else {
-                    // 3) Создаём бронь на первый свободный слот
                     await api('POST', '/api/bookings', {
                         parking_slot_id: free[0].id,
                         start_time:      start,
@@ -50,12 +42,9 @@ $(function() {
                 console.error('Ошибка авто-бронирования:', err);
                 alert(err.responseJSON?.message || 'Ошибка создания брони');
             }
-            // 4) Чистим URL и пере-загружаем таблицу
             window.history.replaceState({}, '', '/bookings');
         }
     })();
-
-    // --- Функции загрузки / отрисовки ---
     async function loadFreeSlots() {
         const slots = await api('GET', '/api/slots/free');
         $slotSel.empty().append('<option value="" disabled selected>Выберите слот</option>');
@@ -63,7 +52,6 @@ $(function() {
             $slotSel.append(`<option value="${s.id}">${s.slot_number} (Зона ${s.zone_id})</option>`);
         });
     }
-
     function renderBookings(bookings) {
         $tbody.empty();
         bookings.forEach(b => {
@@ -87,21 +75,16 @@ $(function() {
             `);
         });
     }
-
     async function loadMy() {
         const arr = await api('GET', '/api/bookings/my');
-        renderBookings(arr);
+        allBookings = arr;
+        renderBookings(allBookings);
     }
-
     async function loadSorted() {
         const arr = await api('GET', '/api/bookings');
-        // pending first
-        const pending = arr.filter(b => b.status === 'pending');
-        const others  = arr.filter(b => b.status !== 'pending');
-        renderBookings([...pending, ...others]);
+        allBookings = [...arr.filter(b => b.status === 'pending'), ...arr.filter(b => b.status !== 'pending')];
+        renderBookings(allBookings);
     }
-
-    // --- Инициализация страницы ---
     (async function init() {
         if (role === 'user') {
             $addBtn.hide();
@@ -111,13 +94,24 @@ $(function() {
             await loadSorted();
         }
     })();
-
-    // --- События ---
+    $search.on('input', function() {
+        const q = $(this).val().trim();
+        if (!q) {
+            renderBookings(allBookings);
+            return;
+        }
+        const id = parseInt(q, 10);
+        if (isNaN(id)) {
+            $tbody.empty();
+            return;
+        }
+        const filtered = allBookings.filter(b => b.id === id);
+        renderBookings(filtered);
+    });
     $addBtn.on('click', async () => {
         $form[0].reset();
         await loadFreeSlots();
     });
-
     $form.on('submit', async e => {
         e.preventDefault();
         const payload = {
@@ -133,7 +127,6 @@ $(function() {
             alert(err.responseJSON?.message || 'Ошибка создания брони');
         }
     });
-
     $tbody
         .on('click', '.cancel-booking', async function() {
             const id = $(this).closest('tr').data('id');

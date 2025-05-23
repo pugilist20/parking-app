@@ -1,13 +1,9 @@
-// server/models/Models.js
 const sequelize = require('../db');
 const { DataTypes } = require('sequelize');
 
-/**
- * Преобразует JS Date (UTC) в строку "dd-mm-yyyy hh:mm:ss" в зоне UTC+3
- */
 function formatDateUTC3(date) {
     if (!date) return null;
-    // Таймстамп в мс + 3 часа
+    
     const dt = new Date(date.getTime() + 3 * 60 * 60 * 1000);
 
     const dd = String(dt.getUTCDate()).padStart(2, '0');
@@ -20,7 +16,7 @@ function formatDateUTC3(date) {
     return `${dd}-${mm}-${yyyy} ${hh}:${mi}:${ss}`;
 }
 
-// Пользователь
+
 const User = sequelize.define('user', {
     id:         { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     username:   { type: DataTypes.STRING, unique: true, allowNull: false },
@@ -36,10 +32,10 @@ const User = sequelize.define('user', {
         }
     }
 }, {
-    updatedAt: false // мы не используем updatedAt у User
+    updatedAt: false 
 });
 
-// Тариф
+
 const Tariff = sequelize.define('tariff', {
     id:             { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name:           { type: DataTypes.STRING, unique: true, allowNull: false },
@@ -48,7 +44,7 @@ const Tariff = sequelize.define('tariff', {
     timestamps: false
 });
 
-// Зона парковки
+
 const Zone = sequelize.define('zone', {
     id:         { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name:       { type: DataTypes.STRING, unique: true, allowNull: false },
@@ -57,7 +53,7 @@ const Zone = sequelize.define('zone', {
     timestamps: false
 });
 
-// Парковочное место
+
 const ParkingSlot = sequelize.define('parking_slot', {
     id:           { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     slot_number:  { type: DataTypes.INTEGER, unique: true, allowNull: false },
@@ -67,7 +63,7 @@ const ParkingSlot = sequelize.define('parking_slot', {
     timestamps: false
 });
 
-// Автомобиль (для истории въезда-выезда)
+
 const Car = sequelize.define('car', {
     id:            { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     license_plate: { type: DataTypes.STRING, unique: true },
@@ -89,10 +85,10 @@ const Car = sequelize.define('car', {
     user_id:          { type: DataTypes.INTEGER, allowNull: false },
     parking_slot_id:  { type: DataTypes.INTEGER, allowNull: false }
 }, {
-    updatedAt: false // не используем updatedAt у Car
+    updatedAt: false 
 });
 
-// Бронирование
+
 const Booking = sequelize.define('booking', {
     id:           { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     start_time: {
@@ -116,13 +112,13 @@ const Booking = sequelize.define('booking', {
     timestamps: false
 });
 
-// Журнал действий
+
 const Log = sequelize.define('log', {
     id:      { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     user_id: { type: DataTypes.INTEGER, allowNull: false },
     action:  { type: DataTypes.STRING,  allowNull: false },
 
-    // кастомные метки времени
+    
     createdAt: {
         type:         DataTypes.DATE,
         defaultValue: DataTypes.NOW,
@@ -143,7 +139,7 @@ const Log = sequelize.define('log', {
     timestamps: true
 });
 
-// Связи с ограничениями целостности
+
 Tariff.hasMany(Zone,      { foreignKey: { name: 'tariff_id', allowNull: false }, onDelete: 'RESTRICT', onUpdate: 'CASCADE' });
 Zone.belongsTo(Tariff,    { foreignKey: { name: 'tariff_id', allowNull: false }, onDelete: 'RESTRICT', onUpdate: 'CASCADE' });
 

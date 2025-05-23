@@ -1,17 +1,12 @@
-/* client/public/css/main.css */
-/* Герой-секция */
 .hero {
-    background: url('/static/img/parking-hero.jpg') center/cover no-repeat;
     color: #fff;
 }
 .hero .form-control {
     opacity: 0.9;
 }
 
-/* Секция «Как это работает» */
 .how-it-works i {
     color: #0d6efd;
 }
 
-/* Общие */
 .container { max-width: 960px; }

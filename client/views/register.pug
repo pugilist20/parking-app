@@ -1,5 +1,4 @@
 extends layout
-
 block content
     .vh-100.d-flex.align-items-center.justify-content-center.bg-white
         .card.shadow-lg(style="max-width: 400px; width: 100%;")
@@ -25,6 +24,5 @@ block content
                 p.text-center.text-danger.mt-3#registerError(style="display:none;")
                 .text-center.mt-2
                     a(href="/login") Уже есть аккаунт? Войти
-
 block scripts
     script(src="/static/js/auth.js")

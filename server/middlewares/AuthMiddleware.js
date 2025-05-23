@@ -1,12 +1,7 @@
-// server/middlewares/AuthMiddleware.js
 const jwt  = require('jsonwebtoken');
 const { User } = require('../models/Models');
 require('dotenv').config();
 
-/**
- * Проверяет наличие и корректность JWT,
- * затем вешает объект пользователя в req.user
- */
 async function authMiddleware(req, res, next) {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith('Bearer ')) {
@@ -19,17 +14,13 @@ async function authMiddleware(req, res, next) {
         if (!user) {
             return res.status(401).json({ message: 'Пользователь не найден' });
         }
-        req.user = user;  // помещаем в req полный объект пользователя
+        req.user = user;  
         next();
     } catch (err) {
         return res.status(401).json({ message: 'Неверный токен' });
     }
 }
 
-/**
- * Проверяет, что роль пользователя входит в allowedRoles.
- * Предполагает, что authMiddleware уже выполнился.
- */
 function roleCheck(allowedRoles) {
     return (req, res, next) => {
         if (!req.user) {

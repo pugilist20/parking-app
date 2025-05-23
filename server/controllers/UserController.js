@@ -1,5 +1,4 @@
 const {UserService} = require('../services/UserService');
-
 class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -9,18 +8,18 @@ class UserController {
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
     }
-
-    async getAll(req, res) {
-        const users = await this.userService.getAll();
-        res.json(users);
+    async getAll(req, res, next) {
+        try {
+            const { id } = req.query;
+            const users = await this.userService.getAll({ id });
+            res.json(users);
+        } catch(err) { next(err); }
     }
-
     async getById(req, res) {
         const user = await this.userService.getById(req.params.id);
         if (!user) return res.status(404).json({message: 'User not found'});
         res.json(user);
     }
-
     async update(req, res) {
         try {
             const user = await this.userService.update(req.params.id, req.body, req.user.id);
@@ -29,7 +28,6 @@ class UserController {
             res.status(400).json({message: err.message});
         }
     }
-
     async delete(req, res) {
         try {
             await this.userService.delete(req.params.id, req.user.id);
@@ -38,7 +36,6 @@ class UserController {
             res.status(400).json({message: err.message});
         }
     }
-
     async create(req, res) {
         try {
             const newUser = await this.userService.create(req.body, req.user.id);
@@ -48,5 +45,4 @@ class UserController {
         }
     }
 }
-
 module.exports = UserController;

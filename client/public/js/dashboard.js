@@ -1,28 +1,27 @@
-// client/public/js/dashboard.js
-
 $(function() {
-    // 1) Обработка формы поиска свободных зон
     $('#searchForm').on('submit', async function(e) {
         e.preventDefault();
         $('#zoneResults').empty();
-
         const start = $('#start').val();
         const end   = $('#end').val();
-
-        // Валидация: обе даты должны быть заполнены и end > start
         if (!start || !end) {
             return alert('Пожалуйста, выберите оба времени начала и конца.');
         }
-        if (new Date(end) <= new Date(start)) {
+        const startDate = new Date(start);
+        const endDate   = new Date(end);
+        if (endDate <= startDate) {
             return alert('Дата окончания должна быть позже даты начала.');
         }
-
+        // Новая проверка: минимум 1 час
+        const diffMs = endDate - startDate;
+        if (diffMs < 60 * 60 * 1000) {
+            return alert('Продолжительность бронирования должна быть не менее 1 часа.');
+        }
         try {
             const zones = await api(
                 'GET',
                 `/api/slots/availability?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`
             );
-
             if (!zones.length) {
                 return $('#zoneResults').append(`
           <div class="col-12">
@@ -32,11 +31,8 @@ $(function() {
           </div>
         `);
             }
-
             zones.forEach(z => {
-                // список свободных слотов в зоне
                 const freeIds = z.freeSlotIds || [];
-                // кнопка или сообщение об отсутствии
                 const bookBtn = freeIds.length
                     ? `<button
                class="btn btn-primary mt-auto book-zone-btn"
@@ -47,7 +43,6 @@ $(function() {
                Забронировать
              </button>`
                     : `<span class="mt-auto text-danger">Нет свободных мест</span>`;
-
                 $('#zoneResults').append(`
           <div class="col-md-4">
             <div class="card h-100 shadow-sm d-flex flex-column">
@@ -66,31 +61,25 @@ $(function() {
           </div>
         `);
             });
-
         } catch (err) {
             console.error('Ошибка поиска зон:', err);
             alert('Не удалось выполнить поиск зон.');
         }
     });
-
-    // 2) Обработчик клика по кнопке «Забронировать»
     $('#zoneResults').on('click', '.book-zone-btn', async function() {
         const freeIds = JSON.parse($(this).attr('data-free-slot-ids'));
-        const slotId  = freeIds[0];             // первый свободный слот
+        const slotId  = freeIds[0];
         const start   = $(this).data('start');
         const end     = $(this).data('end');
-
         if (!slotId) {
             return alert('Ошибка: не найден свободный слот.');
         }
-
         try {
             await api('POST', '/api/bookings', {
                 parking_slot_id: slotId,
                 start_time:      start,
                 end_time:        end
             });
-            // После успешного создания перенаправляем на список броней
             window.location.href = '/bookings';
         } catch (err) {
             console.error('Ошибка создания брони:', err);

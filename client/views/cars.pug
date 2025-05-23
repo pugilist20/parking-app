@@ -1,14 +1,11 @@
-//- client/views/cars.pug
 extends layout
-
 block content
     .d-flex.justify-content-between.align-items-center.mb-4
         h1.mb-0 Автомобили
+        input#carSearch.form-control.w-25(type="text" placeholder="Поиск по гос.номеру…")
         button.btn.btn-success#addCarBtn(type="button" data-bs-toggle="modal" data-bs-target="#carModal")
             i.bi.bi-plus-lg.me-1
             | Добавить автомобиль
-
-    //- Таблица машин
     table.table.table-striped
         thead
             tr
@@ -20,9 +17,6 @@ block content
                 th “Слот”
                 th Действия
         tbody#carsTableBody
-            //- будет заполнено JS
-
-    //- Модальное окно для создания/редактирования
     .modal.fade#carModal(tabindex="-1" aria-hidden="true")
         .modal-dialog
             .modal-content
@@ -44,6 +38,5 @@ block content
                 .modal-footer
                     button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Отмена
                     button.btn.btn-primary(type="submit" form="carForm") Сохранить
-
 block scripts
     script(src="/static/js/cars.js")

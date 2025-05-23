@@ -1,4 +1,4 @@
-// seed-admin.js
+
 require('dotenv').config();
 const sequelize = require('./server/db');
 const { User } = require('./server/models/Models');
@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 
 async function seed() {
     await sequelize.authenticate();
-    await sequelize.sync(); // без force, если не хотите удалять данные
+    await sequelize.sync(); 
 
     const hash = await bcrypt.hash('MySecurePass', 10);
     const [admin, created] = await User.findOrCreate({

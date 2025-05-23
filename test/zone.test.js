@@ -3,13 +3,11 @@ const requestZone = require('supertest');
 const { expect: expZ } = require('chai');
 const appZone    = require('../server/app');
 const initDBZone = require('../server/models/Init');
-
 describe('Zone API', function() {
     this.timeout(5000);
     let adminToken;
     let tariff;
     let zone;
-
     before(async () => {
         await initDBZone();
         await requestZone(appZone).post('/api/auth/register')
@@ -26,7 +24,6 @@ describe('Zone API', function() {
             .send({ name: 'TarZ', price_per_hour: 3 });
         tariff = t.body;
     });
-
     it('POST /api/zones creates zone', () =>
         requestZone(appZone)
             .post('/api/zones')
@@ -35,7 +32,6 @@ describe('Zone API', function() {
             .expect(201)
             .then(res => { zone = res.body; expZ(zone).to.include({ name: 'Z1' }); })
     );
-
     it('GET /api/zones returns array', () =>
         requestZone(appZone)
             .get('/api/zones')
@@ -43,7 +39,6 @@ describe('Zone API', function() {
             .expect(200)
             .then(res => expZ(res.body).to.be.an('array'))
     );
-
     it('DELETE /api/zones/:id deletes zone', () =>
         requestZone(appZone)
             .delete(`/api/zones/${zone.id}`)

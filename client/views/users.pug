@@ -1,12 +1,11 @@
 extends layout
-
 block content
     .d-flex.justify-content-between.align-items-center.mb-4
         h1.mb-0 Пользователи
+        input#searchUserInput.form-control.w-25.ms-2(type="number" placeholder="Поиск по ID…")
         button.btn.btn-success#addUserBtn(type="button" data-bs-toggle="modal" data-bs-target="#userModal")
             i.bi.bi-plus-lg.me-1
             | Добавить пользователя
-
     table.table.table-hover
         thead
             tr
@@ -18,8 +17,6 @@ block content
                 th Дата создания
                 th Действия
         tbody#usersTableBody
-
-    //– Модалка «Добавить/Редактировать пользователя»
     .modal.fade#userModal(tabindex="-1" aria-hidden="true")
         .modal-dialog
             .modal-content
@@ -51,6 +48,5 @@ block content
                 .modal-footer
                     button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Отмена
                     button.btn.btn-primary(type="submit" form="userForm") Сохранить
-
 block scripts
     script(src="/static/js/users.js")

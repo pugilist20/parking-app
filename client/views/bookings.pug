@@ -1,13 +1,12 @@
 extends layout
-
 block content
     .d-flex.justify-content-between.align-items-center.mb-4
         h1.mb-0 Бронирования
-        //– кнопка создания остаётся в разметке, но будем скрывать её JS-ом для non-user
-        button.btn.btn-success#addBookingBtn(type="button" data-bs-toggle="modal" data-bs-target="#bookingModal")
-            i.bi.bi-plus-lg.me-1
-            | Новое бронирование
-
+        input#bookingSearch.form-control.w-25(type="number" placeholder="Поиск по ID…")
+        if role === 'user'
+            button.btn.btn-success#addBookingBtn(type="button" data-bs-toggle="modal" data-bs-target="#bookingModal")
+                i.bi.bi-plus-lg.me-1
+                | Новая бронь
     table.table.table-striped
         thead
             tr
@@ -18,8 +17,6 @@ block content
                 th Статус
                 th Действия
         tbody#bookingsTableBody
-
-    //– Модалка создания новой брони (пользователь)
     .modal.fade#bookingModal(tabindex="-1" aria-hidden="true")
         .modal-dialog
             .modal-content
@@ -41,6 +38,5 @@ block content
                 .modal-footer
                     button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Отмена
                     button.btn.btn-primary(type="submit" form="bookingForm") Забронировать
-
 block scripts
     script(src="/static/js/bookings.js")

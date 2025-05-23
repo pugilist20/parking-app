@@ -1,24 +1,16 @@
-// test/bookings.test.js
 process.env.NODE_ENV = 'test';
-
 const request = require('supertest');
 const { expect } = require('chai');
 const app   = require('../server/app');
 const initDB = require('../server/models/Init');
-
 describe('Booking API', function() {
     this.timeout(5000);
-
     let userToken;
     let adminToken;
     let slotId;
     let booking;
-
     before(async () => {
-        // 1) Полная пересборка схемы
         await initDB();
-
-        // 2) Регистрируем пользователя
         const resUser = await request(app)
             .post('/api/auth/register')
             .send({
@@ -29,8 +21,6 @@ describe('Booking API', function() {
             })
             .expect(201);
         userToken = resUser.body.token;
-
-        // 3) Регистрируем администратора и повышаем роль
         const resAdm = await request(app)
             .post('/api/auth/register')
             .send({
@@ -48,8 +38,6 @@ describe('Booking API', function() {
             .send({ username: 'admBook', password: 'Admin123' })
             .expect(200);
         adminToken = resLoginAdm.body.token;
-
-        // 4) Создаём тариф → зону → слот
         const resTariff = await request(app)
             .post('/api/tariffs')
             .set('Authorization', `Bearer ${adminToken}`)
@@ -66,8 +54,6 @@ describe('Booking API', function() {
             .send({ slot_number: 301, zone_id: resZone.body.id })
             .expect(201);
         slotId = resSlot.body.id;
-
-        // 5) Создаём первую бронь сразу же (чтобы booking.id был доступен дальше)
         const resBooking = await request(app)
             .post('/api/bookings')
             .set('Authorization', `Bearer ${userToken}`)
@@ -79,7 +65,6 @@ describe('Booking API', function() {
             .expect(201);
         booking = resBooking.body;
     });
-
     it('GET /api/bookings/my returns array', () =>
         request(app)
             .get('/api/bookings/my')
@@ -87,7 +72,6 @@ describe('Booking API', function() {
             .expect(200)
             .then(res => expect(res.body).to.be.an('array'))
     );
-
     it('GET /api/bookings/pending returns array', () =>
         request(app)
             .get('/api/bookings/pending')
@@ -95,23 +79,20 @@ describe('Booking API', function() {
             .expect(200)
             .then(res => expect(res.body).to.be.an('array'))
     );
-
     it('POST /api/bookings/cancel/:id cancels booking', () =>
         request(app)
             .post(`/api/bookings/cancel/${booking.id}`)
             .set('Authorization', `Bearer ${userToken}`)
             .expect(200)
     );
-
     it('POST /api/bookings/approve/:id approves booking', () =>
         request(app)
             .post(`/api/bookings/approve/${booking.id}`)
             .set('Authorization', `Bearer ${adminToken}`)
             .expect(200)
     );
-
     it('POST /api/bookings/reject/:id rejects booking', async () => {
-        // Для отклонения создаём новую бронь
+        
         const res2 = await request(app)
             .post('/api/bookings')
             .set('Authorization', `Bearer ${userToken}`)
@@ -122,15 +103,11 @@ describe('Booking API', function() {
             })
             .expect(201);
         const toReject = res2.body;
-
         await request(app)
             .post(`/api/bookings/reject/${toReject.id}`)
             .set('Authorization', `Bearer ${adminToken}`)
             .expect(200);
     });
-
-
-
     it('GET /api/bookings returns array for admin', () =>
         request(app)
             .get('/api/bookings')

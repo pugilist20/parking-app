@@ -1,5 +1,4 @@
 const { CarService } = require('../services/CarService');
-
 class CarController {
     constructor(carService) {
         this.carService = carService;
@@ -11,17 +10,19 @@ class CarController {
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
     }
-
-    async getAll(req, res) {
-        const cars = await this.carService.getAll();
-        res.json(cars);
+    async getAll(req, res, next) {
+        try {
+            const { license_plate } = req.query;
+            const cars = await this.carService.findAll({ license_plate });
+            res.json(cars);
+        } catch (err) {
+            next(err);
+        }
     }
-
     async getActive(req, res) {
         const cars = await this.carService.getActiveCars();
         res.json(cars);
     }
-
     async filter(req, res) {
         try {
             const cars = await this.carService.filter(req.query);
@@ -30,7 +31,6 @@ class CarController {
             res.status(400).json({ message: err.message });
         }
     }
-
     async create(req, res) {
         try {
             const car = await this.carService.create(req.body, req.user.id);
@@ -39,7 +39,6 @@ class CarController {
             res.status(400).json({ message: err.message });
         }
     }
-
     async release(req, res) {
         try {
             const car = await this.carService.release(req.params.id, req.user.id);
@@ -48,7 +47,6 @@ class CarController {
             res.status(400).json({ message: err.message });
         }
     }
-
     async update(req, res) {
         try {
             const car = await this.carService.update(req.params.id, req.body, req.user.id);
@@ -57,7 +55,6 @@ class CarController {
             res.status(400).json({ message: err.message });
         }
     }
-
     async delete(req, res) {
         try {
             await this.carService.delete(req.params.id, req.user.id);
@@ -67,5 +64,4 @@ class CarController {
         }
     }
 }
-
 module.exports = CarController;

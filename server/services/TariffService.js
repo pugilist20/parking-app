@@ -1,6 +1,12 @@
 const { Tariff, Log } = require('../models/Models');
 class TariffService {
-    async getAll() { return Tariff.findAll(); }
+    async getAll({ name }) {
+        const where = {};
+        if (name) {
+            where.name = { [Op.iLike]: `%${name}%` };
+        }
+        return Tariff.findAll({ where });
+    }
     async getById(id) { return Tariff.findByPk(id); }
     async create(data, userId) {
         const tariff = await Tariff.create({ name: data.name, price_per_hour: data.price_per_hour });

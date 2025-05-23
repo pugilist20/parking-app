@@ -1,4 +1,3 @@
-// server/controllers/LogController.js
 const { LogService } = require('../services/LogService');
 
 class LogController {
@@ -8,7 +7,7 @@ class LogController {
         this.getByUser = this.getByUser.bind(this);
     }
 
-    // Получить все логи (только admin)
+    
     async getAll(req, res) {
         try {
             const logs = await this.logService.getAll();
@@ -18,7 +17,7 @@ class LogController {
         }
     }
 
-    // Получить логи конкретного пользователя (только admin)
+    
     async getByUser(req, res) {
         try {
             const userId = req.params.userId;
