@@ -19,7 +19,7 @@ class StatisticsService {
         let dateCondCarsIntersect = '';
         const replacements = {};
 
-        // 1.1. Фильтрация бронирований по периоду (как раньше)
+
         if (start) {
             dateCondBookings += ` AND b.start_time >= :startDate`;
             replacements.startDate = start;
@@ -29,9 +29,9 @@ class StatisticsService {
             replacements.endDate = end;
         }
 
-        // 1.2. Фильтрация машин: сессия пересекает [start, end]
-        //   «c.entry_time <= end» AND «c.exit_time >= start».
-        //   При этом обязательно c.exit_time IS NOT NULL (сессия завершена).
+
+
+
         if (start) {
             dateCondCarsIntersect += ` AND c.exit_time >= :startDate`;
             replacements.startDate = start;
@@ -41,7 +41,7 @@ class StatisticsService {
             replacements.endDate = end;
         }
 
-        // 2) totalBookings (все брони, без учёта машин)
+
         const totalBookingsQuery = `
             SELECT COUNT(*) AS total_bookings
             FROM bookings b
@@ -54,7 +54,7 @@ class StatisticsService {
         });
         const totalBookings = parseInt(totalBookingsResult[0].total_bookings, 10) || 0;
 
-        // 3) approvedCount (только status='approved')
+
         const approvedCountQuery = `
             SELECT COUNT(*) AS approved_count
             FROM bookings b
@@ -67,7 +67,7 @@ class StatisticsService {
         });
         const approvedCount = parseInt(approvedCountResult[0].approved_count, 10) || 0;
 
-        // 4) totalCars — считаем машины, у которых есть exit_time и сессия пересекла период
+
         const totalCarsQuery = `
             SELECT COUNT(*) AS total_cars
             FROM cars c
@@ -97,7 +97,7 @@ class StatisticsService {
         });
         const totalRevenue = parseFloat(revenueResult[0].total_revenue) || 0.0;
 
-        // 6) totalUsers — общее количество пользователей (без фильтрации)
+
         const totalUsers = await User.count();
 
         return {
@@ -114,7 +114,7 @@ class StatisticsService {
         let dateCondCarsIntersect = '';
         const replacements = {};
 
-        // 1) Фильтр для бронирований (approvedBookings)
+
         if (start) {
             dateCondBookings += ` AND b.start_time >= :startDate`;
             replacements.startDate = start;
@@ -124,15 +124,15 @@ class StatisticsService {
             replacements.endDate = end;
         }
 
-        // 2) Фильтр для машин (carsCount и revenue):
-        //    сессия пересекает [start, end]:
+
+
         if (start) {
             dateCondCarsIntersect += ` AND c.exit_time >= :startDate`;
-            // replacements.startDate уже прописан
+
         }
         if (end) {
             dateCondCarsIntersect += ` AND c.entry_time <= :endDate`;
-            // replacements.endDate уже прописан
+
         }
 
         const zonesStatsQuery = `

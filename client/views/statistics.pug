@@ -1,11 +1,9 @@
-
 extends layout
 
 block content
     .container.mt-4
         h1.text-center.mb-4.text-primary Статистика
 
-        // 1. Форма выбора диапазона дат: три колонки в одной строке
         .card.mb-4
             .card-body
                 form#dateFilterForm
@@ -51,7 +49,6 @@ block content
                                 h6.text-center.mb-2 Пользователей
                                 p#totalUsers.lead.mb-0 0
 
-        // 3. Таблица статистики по зонам
         .card.mb-4
             .card-body
                 h5.card-title Зоны

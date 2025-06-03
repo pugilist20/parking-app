@@ -7,7 +7,7 @@ class StatisticsController {
         this.getByZone    = this.getByZone.bind(this);
     }
 
-    // GET /api/statistics/overview?start=YYYY-MM-DD&end=YYYY-MM-DD
+
     async getOverview(req, res, next) {
         try {
             const { start, end } = req.query;
@@ -18,7 +18,7 @@ class StatisticsController {
         }
     }
 
-    // GET /api/statistics/zones?start=YYYY-MM-DD&end=YYYY-MM-DD
+
     async getByZone(req, res, next) {
         try {
             const { start, end } = req.query;

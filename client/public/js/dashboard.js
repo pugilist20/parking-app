@@ -12,7 +12,7 @@ $(function() {
         if (endDate <= startDate) {
             return alert('Дата окончания должна быть позже даты начала.');
         }
-        // Новая проверка: минимум 1 час
+
         const diffMs = endDate - startDate;
         if (diffMs < 60 * 60 * 1000) {
             return alert('Продолжительность бронирования должна быть не менее 1 часа.');

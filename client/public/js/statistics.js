@@ -11,7 +11,7 @@ $(function() {
         return `${yyyy}-${mm}-${dd}`;
     }
 
-    // По умолчанию — последняя неделя:
+
     const defaultEnd = todayISO();
     const defaultStart = (() => {
         const d = new Date();
@@ -22,11 +22,11 @@ $(function() {
         return `${yyyy}-${mm}-${dd}`;
     })();
 
-    // Устанавливаем стартовые значения в date-поля:
+
     $('#startDate').val(defaultStart);
     $('#endDate').val(defaultEnd);
 
-    // Формирует GET-параметры ?start=…&end=…
+
     function getDateQueryParams() {
         const start = $('#startDate').val();
         const end = $('#endDate').val();
@@ -36,7 +36,7 @@ $(function() {
         return params.toString();
     }
 
-    // 2.2. Загрузка «Обзора» (здесь: бронирования, одобренные, автомобили, выручка, пользователи)
+
     async function loadOverview() {
         try {
             const qs = getDateQueryParams();
@@ -54,7 +54,7 @@ $(function() {
         }
     }
 
-    // 2.3. Загрузка «Зон» (с учётом нового столбца — автомобили)
+
     async function loadZonesStats() {
         try {
             const qs = getDateQueryParams();
@@ -83,7 +83,7 @@ $(function() {
         }
     }
 
-    // 2.4. Обработчик формы фильтрации по датам
+
     $('#dateFilterForm').on('submit', function(e) {
         e.preventDefault();
         const start = $('#startDate').val();
