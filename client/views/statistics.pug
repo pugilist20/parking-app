@@ -1,0 +1,71 @@
+
+extends layout
+
+block content
+    .container.mt-4
+        h1.text-center.mb-4.text-primary Статистика
+
+        // 1. Форма выбора диапазона дат: три колонки в одной строке
+        .card.mb-4
+            .card-body
+                form#dateFilterForm
+                    .row.g-3.align-items-end
+                        .col-md-4
+                            label.form-label(for="startDate") Дата с:
+                            input#startDate.form-control(type="date")
+
+                        .col-md-4
+                            label.form-label(for="endDate") Дата по:
+                            input#endDate.form-control(type="date")
+
+                        .col-md-4
+                            button#applyFilter.btn.btn-primary.w-100(type="submit") Применить
+
+        .card.mb-4
+            .card-body
+                h5.card-title.mb-3 Обзор
+                .row.g-3
+                    .col
+                        .card.h-100
+                            .card-body.d-flex.flex-column.align-items-center.justify-content-center
+                                h6.text-center.mb-2 Всего бронирований
+                                p#totalBookings.lead.mb-0 0
+                    .col
+                        .card.h-100
+                            .card-body.d-flex.flex-column.align-items-center.justify-content-center
+                                h6.text-center.mb-2 Одобрено
+                                p#approvedCount.lead.mb-0 0
+                    .col
+                        .card.h-100
+                            .card-body.d-flex.flex-column.align-items-center.justify-content-center
+                                h6.text-center.mb-2 Автомобили
+                                p#totalCars.lead.mb-0 0
+                    .col
+                        .card.h-100
+                            .card-body.d-flex.flex-column.align-items-center.justify-content-center
+                                h6.text-center.mb-2 Общая выручка
+                                p#totalRevenue.lead.mb-0 ₸0.00
+                    .col
+                        .card.h-100
+                            .card-body.d-flex.flex-column.align-items-center.justify-content-center
+                                h6.text-center.mb-2 Пользователей
+                                p#totalUsers.lead.mb-0 0
+
+        // 3. Таблица статистики по зонам
+        .card.mb-4
+            .card-body
+                h5.card-title Зоны
+                table.table.table-hover
+                    thead
+                        tr
+                            th ID
+                            th Название
+                            th Всего слотов
+                            th Свободных
+                            th Бронирований
+                            th Автомобили
+                            th Выручка
+                    tbody#zonesStatsBody
+
+block scripts
+    script(src="/static/js/statistics.js")

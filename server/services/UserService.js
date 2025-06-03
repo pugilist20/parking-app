@@ -13,7 +13,6 @@ class UserService {
         const user = await User.findByPk(id);
         if (!user) throw new Error('User not found');
         delete data.password;
-        delete data.role;
         await user.update(data);
         await Log.create({ user_id: userId, action: `Updated user ${id}` });
         return user;

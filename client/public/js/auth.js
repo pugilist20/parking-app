@@ -10,10 +10,9 @@ $(function() {
         return JSON.parse(window.atob(base64));
     }
     const roleAllowed = {
-        admin:    ['/dashboard','/cars','/slots','/tariffs','/zones','/bookings','/users'],
-        employee: ['/dashboard','/cars','/slots','/bookings'],
+        admin:    ['/dashboard','/cars','/slots','/tariffs','/zones','/bookings','/users','/statistics'],
+        employee: ['/dashboard','/cars','/slots','/bookings','/statistics'],
         user:     ['/dashboard','/bookings'],
-        guest:    ['/dashboard','/bookings']
     };
     if (!publicPaths.includes(path) && !token) {
         window.location.href = '/login';
