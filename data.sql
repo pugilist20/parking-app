@@ -17,17 +17,17 @@ VALUES
     (1, 1, 'free'),
     (1, 2, 'free'),
     (1, 3, 'free'),
-    (1, 4, 'occupied'),
-    (1, 5, 'occupied'),
+    (1, 4, 'free'),
+    (1, 5, 'free'),
 
     (2, 6, 'occupied'),
-    (2, 7, 'occupied'),
+    (2, 7, 'free'),
     (2, 8, 'free'),
 
-    (3, 9,  'occupied'),
+    (3, 9,  'free'),
     (3, 10, 'free'),
     (3, 11, 'free'),
-    (3, 12, 'occupied'),
+    (3, 12, 'free'),
 
     (4, 13, 'free'),
     (4, 14, 'free'),

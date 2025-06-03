@@ -3,44 +3,28 @@ const {ParkingSlot, Zone, Tariff, User, Car} = require('../models/Models');
 const sequelize = require('../db');
 
 class StatisticsService {
-    /**
-     * 1) Общая статистика:
-     *    • totalBookings   — всего бронирований за период (не изменялось)
-     *    • approvedCount   — одобренных бронирований за период (не изменялось)
-     *    • totalCars       — количество машин, чья сессия пересекла [start, end]
-     *    • totalRevenue    — суммарная выручка по машинам (calculating by (exit_time-entry_time)*price)
-     *    • totalUsers      — общее количество пользователей (без фильтра)
-     *
-     * @param {string} start — 'YYYY-MM-DD', опционально
-     * @param {string} end   — 'YYYY-MM-DD', опционально
-     */
     async getOverview(start, end) {
         let dateCondBookings = '';
-        let dateCondCarsIntersect = '';
+        let dateCondCars = '';
         const replacements = {};
 
-
         if (start) {
-            dateCondBookings += ` AND b.start_time >= :startDate`;
+            dateCondBookings += ` AND b.start_time::date >= :startDate`;
             replacements.startDate = start;
         }
         if (end) {
-            dateCondBookings += ` AND b.start_time <= :endDate`;
+            dateCondBookings += ` AND b.end_time::date <= :endDate`;
             replacements.endDate = end;
         }
 
-
-
-
         if (start) {
-            dateCondCarsIntersect += ` AND c.exit_time >= :startDate`;
+            dateCondCars += ` AND c.exit_time::date >= :startDate`;
             replacements.startDate = start;
         }
         if (end) {
-            dateCondCarsIntersect += ` AND c.entry_time <= :endDate`;
+            dateCondCars += ` AND c.entry_time::date <= :endDate`;
             replacements.endDate = end;
         }
-
 
         const totalBookingsQuery = `
             SELECT COUNT(*) AS total_bookings
@@ -54,7 +38,6 @@ class StatisticsService {
         });
         const totalBookings = parseInt(totalBookingsResult[0].total_bookings, 10) || 0;
 
-
         const approvedCountQuery = `
             SELECT COUNT(*) AS approved_count
             FROM bookings b
@@ -67,12 +50,11 @@ class StatisticsService {
         });
         const approvedCount = parseInt(approvedCountResult[0].approved_count, 10) || 0;
 
-
         const totalCarsQuery = `
             SELECT COUNT(*) AS total_cars
             FROM cars c
             WHERE c.exit_time IS NOT NULL
-                ${dateCondCarsIntersect}
+                ${dateCondCars}
         `;
         const totalCarsResult = await sequelize.query(totalCarsQuery, {
             type: Sequelize.QueryTypes.SELECT,
@@ -89,14 +71,13 @@ class StatisticsService {
                      JOIN zones z ON z.id = ps.zone_id
                      JOIN tariffs t ON t.id = z.tariff_id
             WHERE c.exit_time IS NOT NULL
-                ${dateCondCarsIntersect}
+                ${dateCondCars}
         `;
         const revenueResult = await sequelize.query(revenueQuery, {
             type: Sequelize.QueryTypes.SELECT,
             replacements
         });
         const totalRevenue = parseFloat(revenueResult[0].total_revenue) || 0.0;
-
 
         const totalUsers = await User.count();
 
@@ -111,38 +92,33 @@ class StatisticsService {
 
     async getByZone(start, end) {
         let dateCondBookings = '';
-        let dateCondCarsIntersect = '';
+        let dateCondCars = '';
         const replacements = {};
 
-
         if (start) {
-            dateCondBookings += ` AND b.start_time >= :startDate`;
+            dateCondBookings += ` AND b.start_time::date >= :startDate`;
             replacements.startDate = start;
         }
         if (end) {
-            dateCondBookings += ` AND b.start_time <= :endDate`;
+            dateCondBookings += ` AND b.end_time::date <= :endDate`;
             replacements.endDate = end;
         }
 
-
-
         if (start) {
-            dateCondCarsIntersect += ` AND c.exit_time >= :startDate`;
-
+            dateCondCars += ` AND c.exit_time::date >= :startDate`;
+            replacements.startDate = start;
         }
         if (end) {
-            dateCondCarsIntersect += ` AND c.entry_time <= :endDate`;
-
+            dateCondCars += ` AND c.entry_time::date <= :endDate`;
+            replacements.endDate = end;
         }
 
         const zonesStatsQuery = `
             SELECT z.id                  AS zone_id,
                    z.name                AS zone_name,
 
-                   -- 3) Общее количество **уникальных** слотов в зоне:
                    COUNT(DISTINCT ps.id) AS total_slots,
 
-                   -- 4) Количество **уникальных** свободных слотов (ps.status = 'free'):
                    COUNT(
                            DISTINCT CASE
                                         WHEN ps.status = 'free' THEN ps.id
@@ -150,27 +126,20 @@ class StatisticsService {
                        END
                    )                     AS free_slots,
 
-                   -- 5) Количество одобренных бронирований (status='approved'), с учётом фильтра по датам:
                    COUNT(b.id) FILTER (
                        WHERE b.status = 'approved'
                            ${dateCondBookings}
                        )                 AS approved_bookings,
 
-                   -- 6) Количество машин в зоне (carsCount), т. е. 
-                   --    считаем **каждую** запись из cars (не DISTINCT),
-                   --    только те, чья сессия пересекла период:
                    COUNT(c.id) FILTER (
                        WHERE c.exit_time IS NOT NULL
-                                            ${dateCondCarsIntersect} ) AS cars_count,
+                                            ${dateCondCars} )                     AS cars_count,
 
-              -- 7) Выручка по зоне: 
-              --    для каждой машины (из cars) берём (exit_time - entry_time)/3600 * price_per_hour,
-              --    фильтруем те же условия по car (exit_time IS NOT NULL + пересечение периода).
-              COALESCE(
-                SUM(
-                  EXTRACT(EPOCH FROM (c.exit_time - c.entry_time)) / 3600 * t.price_per_hour
-                ) FILTER (
-                  WHERE c.exit_time IS NOT NULL ${dateCondCarsIntersect}
+                COALESCE(
+          SUM(
+            EXTRACT(EPOCH FROM (c.exit_time - c.entry_time)) / 3600 * t.price_per_hour
+          ) FILTER (
+            WHERE c.exit_time IS NOT NULL ${dateCondCars}
                 ), 0
                 ) AS revenue
 
@@ -179,7 +148,8 @@ class StatisticsService {
             ON t.id = z.tariff_id
                 LEFT JOIN parking_slots ps ON ps.zone_id = z.id
                 LEFT JOIN bookings b
-                ON b.parking_slot_id = ps.id AND b.status = 'approved'
+                ON b.parking_slot_id = ps.id
+                AND b.status = 'approved'
                 LEFT JOIN cars c
                 ON c.parking_slot_id = ps.id
 
