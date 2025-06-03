@@ -1,19 +1,28 @@
 extends layout
+
 block content
-    .py-5.bg-white
-        .container
-            h1.text-center.mb-4.text-primary Park. Pay. Go.
-            p.lead.text-center.mb-5 Введите диапазон времени и узнайте, в каких зонах есть свободные места.
-            form#searchForm.row.g-2.justify-content-center
-                .col-auto
-                    input.form-control(type="datetime-local" id="start" name="start" required)
-                .col-auto
-                    input.form-control(type="datetime-local" id="end"   name="end"   required)
-                .col-auto
-                    button.btn.btn-primary(type="submit")
-                        i.bi.bi-search.me-1
-                        | Найти
-    .container.mt-4
-        #zoneResults.row.g-4
+    .d-flex.flex-column.min-vh-100
+        .py-5.bg-white
+            .container
+                h1.text-center.mb-4.text-primary Park. Pay. Go.
+                p.lead.text-center.mb-5 Введите диапазон времени и узнайте, в каких зонах есть свободные места.
+                form#searchForm.row.g-2.justify-content-center
+                    .col-auto
+                        input.form-control(type="datetime-local" id="start" name="start" required)
+                    .col-auto
+                        input.form-control(type="datetime-local" id="end"   name="end"   required)
+                    .col-auto
+                        button.btn.btn-primary(type="submit")
+                            i.bi.bi-search.me-1
+                            | Найти
+
+        .container.mt-4.flex-grow-1
+            #zoneResults.row.g-4
+
+        footer.footer.bg-white.py-4.mt-auto
+            .container.text-center.text-muted
+                p.mb-1 Адрес офиса: ул. Баумана, 18, Казань, Республика Татарстан, Россия
+                p Телефон для связи: +7 (843) 123-45-67
+
 block scripts
     script(src="/static/js/dashboard.js")
